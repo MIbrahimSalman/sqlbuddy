@@ -20,7 +20,7 @@ SRC_DATASET = f"{USER}/sqlbuddy-src"
 # Exact library versions used on Kaggle (torch comes preinstalled in the Kaggle image).
 PIP = ("pip install -q transformers==5.22.1 peft==0.21.2 accelerate==1.15.0 datasets==5.1.0 "
        "huggingface_hub==2.4.0 nltk==3.9.2")
-PIP_TRAIN = PIP + " trl==1.17.1"
+PIP_TRAIN = PIP + " trl==1.17.1 matplotlib==3.11.2"
 
 SETUP = r'''
 # Locate our shared code (Kaggle dataset "sqlbuddy-src") and the Spider databases, then import.
@@ -112,8 +112,41 @@ display(pred[["question", "gold_sql", "pred_sql", "hardness", "exec_match", "exa
     ]
 
 
+def nb02(smoke: bool):
+    steps = 30 if smoke else -1
+    return [
+        md("""
+# SQLBuddy 02 - LoRA fine-tuning
+Fine-tunes `Qwen/Qwen2.5-Coder-1.5B-Instruct` with LoRA (r=16, alpha=32, dropout 0.05, attention + MLP
+projections) on Spider train (6,648 examples; 352 from 8 held-out databases for validation).
+2 epochs, lr 2e-4, cosine, effective batch 16, max length 1536, fp16, loss on the SQL completion only.
+The prompt is exactly the one used for evaluation. Code: `src/train.py` in the repo.
+"""),
+        code("import os\nos.environ['CUDA_VISIBLE_DEVICES'] = '0'  # use one T4 (no DataParallel)\n"
+             "os.environ['TOKENIZERS_PARALLELISM'] = 'false'"),
+        code(PIP_TRAIN),
+        code(SETUP),
+        code(f"""
+# MAX_STEPS = -1 -> full 2-epoch run; 30 -> smoke test to measure time/memory.
+MAX_STEPS = {steps}
+from src.train import main
+args = ["--out", "/kaggle/working/train", "--spider-root", str(SPIDER_ROOT), "--max-steps", str(MAX_STEPS)]
+if MAX_STEPS > 0:
+    args += ["--eval-steps", "30"]
+main(args)
+"""),
+        code("""
+import pandas as pd
+from IPython.display import Image, display
+display(Image("/kaggle/working/train/loss_curve.png"))
+display(pd.read_csv("/kaggle/working/train/loss_history.csv").tail(20))
+"""),
+    ]
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", nargs="*", default=[], help="notebook numbers to build in smoke-test mode")
     a = ap.parse_args()
     write("01_baseline_eval", "Baseline eval", nb01("01" in a.smoke), [SPIDER_DATASET, SRC_DATASET])
+    write("02_train_lora", "Train LoRA", nb02("02" in a.smoke), [SPIDER_DATASET, SRC_DATASET])
