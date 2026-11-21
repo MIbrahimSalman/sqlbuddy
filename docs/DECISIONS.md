@@ -17,5 +17,8 @@ Format: decision — reason — alternatives considered. User answers are marked
 - **HF upload happens from this environment, not from Kaggle** — no HF token has to be stored in Kaggle secrets.
 - **Kaggle CLI 2.2.5** works with the `KGAT_` token from `KAGGLE_API_TOKEN` directly; no legacy key needed.
 
-## Open questions (awaiting user answers)
-See the Phase 0 status message; answers will be recorded here.
+## User answers after Phase 0 (2026-11-21)
+- **(user) Validation split = hold out whole databases** (~5% of train examples, from DBs not used for training). Reason: Spider dev uses databases unseen in training, so a DB-disjoint validation set makes val loss a fair proxy for cross-database generalization. Alternative: random 5% of examples (optimistic, DBs overlap).
+- **(user) Exact match = official Spider exact-set-match** (component-level, values ignored). Reason: standard metric, comparable to the literature. Alternatives: normalized string match; both.
+- **(user) Training data = `train_spider.json` only (7,000)**, not `train_others.json`. Reason: matches the brief and HF copy; train_others has a different style and +24% training time.
+- **(user) Phase 1 plan approved** as written in PLAN.md.

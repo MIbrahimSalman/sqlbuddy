@@ -1,0 +1,18 @@
+{
+  "id": "mibrahimsalman022/sqlbuddy-01-baseline-eval",
+  "title": "sqlbuddy-01-baseline-eval",
+  "code_file": "01_baseline_eval.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "jeromeblanchet/yale-universitys-spider-10-nlp-dataset",
+    "mibrahimsalman022/sqlbuddy-src"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
