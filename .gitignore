@@ -1,0 +1,39 @@
+# --- secrets: never commit ---
+.env
+.env.*
+kaggle.json
+access_token
+*.token
+**/.kaggle/
+
+# --- model weights / checkpoints ---
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.gguf
+*.ckpt
+checkpoints/
+adapter/
+outputs/
+kaggle_outputs/
+
+# --- large data (Spider is downloaded, never committed) ---
+data/
+spider/
+*.zip
+# SQLite DBs are ignored except the small demo DB we generate
+*.sqlite
+*.db
+!sample_db/university.db
+
+# --- python / tooling ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+.DS_Store
+gradio_cached_examples/
+.gradio/
