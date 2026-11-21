@@ -1,0 +1,56 @@
+{
+  "model": "base",
+  "n_examples": 1034,
+  "batch_size": 16,
+  "max_new_tokens": 256,
+  "decoding": "greedy",
+  "seconds": {
+    "load": 26,
+    "generate": 224,
+    "score": 26
+  },
+  "gpu": "Tesla T4",
+  "versions": {
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.22.1",
+    "peft": "0.21.2"
+  },
+  "metrics": [
+    {
+      "level": "easy",
+      "count": 248,
+      "exec_acc": 72.18,
+      "exact_match": 63.31,
+      "valid_sql": 89.11
+    },
+    {
+      "level": "medium",
+      "count": 446,
+      "exec_acc": 59.19,
+      "exact_match": 27.13,
+      "valid_sql": 74.89
+    },
+    {
+      "level": "hard",
+      "count": 174,
+      "exec_acc": 39.66,
+      "exact_match": 16.09,
+      "valid_sql": 70.69
+    },
+    {
+      "level": "extra",
+      "count": 166,
+      "exec_acc": 46.39,
+      "exact_match": 17.47,
+      "valid_sql": 68.67
+    },
+    {
+      "level": "all",
+      "count": 1034,
+      "exec_acc": 56.96,
+      "exact_match": 32.4,
+      "valid_sql": 76.6
+    }
+  ]
+}

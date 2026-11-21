@@ -61,6 +61,8 @@ def code(text):
 def write(slug, title, cells, datasets, gpu=True):
     folder = HERE / slug
     folder.mkdir(exist_ok=True)
+    for i, c in enumerate(cells):  # nbformat >= 4.5 wants a unique id per cell
+        c["id"] = f"cell-{i:02d}"
     nb = {
         "cells": cells,
         "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
