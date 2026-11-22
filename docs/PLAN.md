@@ -85,29 +85,31 @@ Estimated ~1 h. **Actual: 8 min total** (smoke 2 min, full 6 min; generation 0.2
 ### Risks
 fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on long examples (reduce per-device batch to 2, grad-accum 8); Kaggle 12 h limit (far away; checkpoints anyway).
 
-## Phase 3 — Fine-tuned evaluation
-- [ ] `notebooks/03_finetuned_eval/`: same code path as 01 (shared `src/`), adapter loaded from the Phase-2 kernel output (or HF), same prompts/decoding/metrics.
-- [ ] `results/finetuned/` predictions + metrics; `results/comparison.csv` (base vs FT, overall + per hardness, EX/EM/valid, deltas).
-- Expected GPU time ~30–45 min.
+## Phase 3 — Fine-tuned evaluation (plan approved)
+- [x] `notebooks/03_finetuned_eval/` generated: same `src/run_eval.py` as notebook 01; only change = `--adapter` (02 kernel output attached as `kernel_sources`, merged into the base with `merge_and_unload`). Same prompts, greedy, 256 tokens, batch 16.
+- [ ] Smoke run on 50 examples (checks adapter loading + output format), then the full dev set.
+- [ ] Download to `results/finetuned/` (predictions.csv, metrics.csv, run_info.json, log).
+- [ ] `src/compare.py` → `results/comparison.csv`: rows = level (easy/medium/hard/extra/all) × columns base/FT/delta for exec_acc, exact_match, valid_sql (+ counts).
+- Testing: compare.py unit-tested on CPU (base vs base must give delta 0). Expected GPU time ~10 min total (baseline took 6 min; merged LoRA has the same speed).
+- Risk: adapter path inside the kernel input differs → notebook globs for `adapter_config.json` outside `checkpoint-*`.
 
----
+## Phase 4 — Analysis (plan approved; CPU only)
+- [ ] `src/analysis.py` (run locally, outputs in `results/`):
+  - `exec_acc_by_level.png` grouped bars base vs FT (overall + 4 levels, value labels, n per level);
+  - `valid_sql_rate.png` (base vs FT, overall + per level); `exact_match_by_level.png`;
+  - `loss_curve.png` (train + validation loss, from `loss_history.csv`);
+  - `flips.csv` + statistics: wrong→correct, correct→wrong, both right/wrong; **McNemar's exact test** (binomial on discordant pairs, scipy) and a **95% paired bootstrap CI** (10,000 resamples) for the EX difference; also per level.
+- [ ] Error categories for FT failures: automatic pre-label by comparing gold vs predicted SQL structure (parsed with the official Spider parser / `sqlglot`): invalid SQL; wrong table; wrong column; missing/incorrect JOIN; GROUP BY / aggregation; nested query / set operation; wrong condition / value; ORDER BY / LIMIT; other. Then I review ~50 sampled failures (stratified by level, seed 42) by hand and correct labels → `results/error_categories.csv`.
+- [ ] `results/error_analysis.md`: category table + discussion; 5 fixed-by-FT examples and 5 still-wrong (question, gold, base pred, FT pred, why); regressions (correct→wrong) with examples; error-type shift base vs FT (e.g. fewer "no such column"); caveats (accidental EX matches, EM vs EX disagreements).
+- Done when: all charts + error_analysis.md exist and numbers match comparison.csv.
 
-## Phase 4 — Analysis (most important for grading)
-- [ ] Charts (PNG): EX base vs FT grouped bars (overall + per hardness), valid-SQL rate, training/val loss curve.
-- [ ] `results/error_analysis.md`: categorize ~50 FT failures (wrong table, wrong column, JOIN, GROUP BY/aggregation, condition/value, nesting, invalid SQL) — rule-assisted pre-labels then manual review; 5 fixed-by-FT examples, 5 still-wrong examples (question, gold, base pred, FT pred); regressions (correct→wrong) discussed.
-- [ ] Statistics: flip counts (wrong→correct, correct→wrong), McNemar's exact test (scipy), 95% bootstrap CI for EX difference.
-- CPU only, no GPU.
-
----
-
-## Phase 5 — Demo
-- [ ] `sample_db/make_university_db.py` → `sample_db/university.db` (students, teachers, courses, enrollments, grades; ~50–200 rows, fixed seed).
-- [ ] `app/app.py` (Gradio): pick university.db or upload .sqlite; schema view; question box; Base / Fine-tuned toggle; generated SQL + result table. Read-only SQLite (`mode=ro`) and SELECT-only guard (single statement, must start with SELECT/WITH; reject anything else).
-- [ ] CPU fp32 loading from HF (base + adapter via PEFT); cache both models.
-- [ ] `notebooks/04_demo/`: same app on GPU with `share=True` link (backup).
-- [ ] Test locally on CPU here (load + 2 queries).
-
----
+## Phase 5 — Demo (plan approved)
+- [ ] `sample_db/make_university_db.py` (fixed seed, stdlib only) → `sample_db/university.db`: tables `students`, `teachers`, `courses` (FK teacher), `enrollments` (student, course, semester), `grades` (enrollment, score, letter); ~150 rows in total; realistic names/departments.
+- [ ] `app/sqlbuddy_core.py`: model manager (lazy-load base; FT = base + adapter from HF `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora` via PEFT; keeps both loaded, using `disable_adapter()` for base → only one copy of the weights in RAM, ~6 GB fp32); `safe_select()`: single statement, must start with SELECT/WITH, rejects ; chains / PRAGMA / ATTACH etc., executes via `src.execution` read-only with timeout and row cap (200).
+- [ ] `app/app.py` (Gradio 6.31): DB choice (sample / upload .sqlite/.db), schema view, question box + example questions, Base / Fine-tuned radio, outputs: generated SQL, result table, timing, error message. Reuses `src/schema.py` + `src/prompts.py` + `src/sql_extract.py` → identical prompt to evaluation.
+- [ ] HF access: the adapter repo is private → the laptop needs `HF_TOKEN` (read) or `huggingface-cli login`; documented. (Alternative if you prefer: make the adapter repo public later.)
+- [ ] `notebooks/04_demo/`: same app on GPU, `share=True` public link, adapter taken from the 02 kernel output (no token needed); runs until stopped / session timeout.
+- [ ] Tests: unit tests for `safe_select`; CPU smoke test here (load model, 2 questions on university.db, base and FT).
 
 ## Phase 6 — Documentation
 - [ ] README.md: problem, why text-to-SQL, dataset, method + mermaid pipeline, training setup, results table + charts, error analysis summary, limitations, reproduction (Kaggle steps), demo on Windows/Mac.

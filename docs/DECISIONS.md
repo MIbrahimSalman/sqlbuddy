@@ -41,3 +41,7 @@ Format: decision — reason — alternatives considered. User answers are marked
 - **(user) max_length = 1536** (drop, don't truncate, longer examples: 88 of 7,000 = 1.3%). Reason: keeps more large-schema examples; truncation would cut the SQL target. Alternative: 1024 (drops 4.7%).
 - **(user) After the smoke run: report the estimate and start the full run automatically if ≤ 3 h**, otherwise wait for OK.
 - **(user) Phase 2 plan approved.**
+
+## User answers during Phase 2 (2026-11-22)
+- **(user) Phases 3, 4 and 5 plans approved** to run back-to-back (status update after each; ask if something unexpected).
+- **(user) Adapter repo stays private**; the laptop demo authenticates with an HF read token (`HF_TOKEN` env var or `hf auth login`). Alternatives: public repo; local adapter folder.
