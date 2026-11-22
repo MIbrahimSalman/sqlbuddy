@@ -258,14 +258,11 @@ further checks apply: a keyword check, an SQLite authorizer that only permits re
 - 8 GB RAM minimum (16 GB recommended; the fp32 model needs about 6 GB) and 4 GB free disk (model download, once).
 - No GPU needed: the model runs in fp32 on CPU, and a question takes about 3–15 s.
 
-### Access to the adapter
+### The adapter: public, no login needed
 
-The adapter lives in a **private** Hugging Face repo, `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora`.
-You need a Hugging Face account with access to it (the owner can add group members), plus a *read* token
-from https://huggingface.co/settings/tokens. Without access, the app still runs with the base model only.
-
-Alternatively, download the `adapter/` folder from the `sqlbuddy-02-train-lora` Kaggle kernel output and set
-`SQLBUDDY_ADAPTER` to that folder.
+The adapter is in the **public** Hugging Face repo
+[`ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora`](https://huggingface.co/ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora).
+The app downloads it automatically, so you do not need a Hugging Face account or token.
 
 ### Windows (PowerShell)
 ```powershell
@@ -275,7 +272,6 @@ py -3.12 -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements-demo.txt
-hf auth login
 python app/app.py
 ```
 
@@ -286,23 +282,17 @@ cd sqlbuddy
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-demo.txt
-hf auth login
 python app/app.py
 ```
 
-**If `hf auth login` does not work** (e.g. "hf is not recognized" / "command not found"):
-- Make sure the virtual environment is active: the prompt starts with `(.venv)`. On Windows, if
-  `Activate.ps1` is blocked, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, or use
-  `cmd` with `.venv\Scripts\activate.bat`.
-- Call the login through Python instead (same tool, no PATH needed):
-  `python -m huggingface_hub.cli.hf auth login`
-- Or skip the login and pass the token for this terminal session only:
-  PowerShell `$env:HF_TOKEN="hf_..."`, macOS `export HF_TOKEN=hf_...`, then `python app/app.py`.
+**If PowerShell blocks `Activate.ps1`:** run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, or use
+`cmd` with `.venv\Scripts\activate.bat`. The prompt must start with `(.venv)` before you run `pip install`.
 
 ### Using the app
 1. Open http://127.0.0.1:7860.
 2. Click an example question, choose **Compare both** and press **Generate SQL and run**.
-   - The first question downloads the model (about 3 GB, once) and loads it (about 1 min).
+   - Wait until the status bar says **Model ready**. On the very first start the model is downloaded first
+     (about 3 GB, once); later starts take seconds.
    - Good comparison questions: *"What is the average score in each course? Show the course title."* and
      *"List the names of students from Lahore."* The base model fails both with an alias error; the
      fine-tuned model answers correctly.
@@ -312,22 +302,48 @@ python app/app.py
 Other options:
 - Local adapter folder instead of HF: `SQLBUDDY_ADAPTER=path/to/adapter python app/app.py`
   (PowerShell: `$env:SQLBUDDY_ADAPTER="path\to\adapter"`).
-- Public link: `python app/app.py --share`.
+- Public link from your laptop: `python app/app.py --share`. It works while your laptop runs the app.
 
-### Backup: GPU demo on Kaggle
+### Fast, nothing to install: the GPU demo on Kaggle (recommended for the presentation)
 
-Open the Kaggle notebook `sqlbuddy-04-demo`. The adapter comes from the training kernel output, so no HF
-token is needed.
-1. Choose *GPU T4* and turn *Internet* on.
-2. *Run all*.
-3. Open the printed `PUBLIC LINK: https://….gradio.live`. It stays up for `DEMO_MINUTES` (90).
+The Kaggle notebook `sqlbuddy-04-demo` runs the same app on a free T4 GPU, at about 1–4 s per question.
+Anyone can open it with the public link it prints.
+
+1. Log in at kaggle.com and open **Your Work → Code → `sqlbuddy-04-demo`**, then click **Edit**.
+2. In the right panel, set *Accelerator* to **GPU T4** and turn **Internet on**.
+3. Click **Run all**. After 3–5 minutes the last cell prints `PUBLIC LINK: https://….gradio.live`.
+4. Share that link. It works for **90 minutes**; press **Stop** when you are done to save GPU quota.
+   Kaggle gives about 30 free GPU hours per week.
+
+**It always runs the latest app.** At the start of every run, the notebook downloads the app from this
+GitHub repository (branch `main`) and the adapter from Hugging Face. Any change merged into `main` therefore
+shows up on Kaggle automatically. The first cell's output prints which commit it ran.
+
+### After changing the app: `scripts/deploy.sh`
+
+Merge your change into `main` (pull request), then run:
+```bash
+bash scripts/deploy.sh
+```
+It does four things:
+1. runs the tests;
+2. checks that your commit is in GitHub `main`;
+3. refreshes the Kaggle code dataset used by notebooks 01–03;
+4. does a short (1-minute) test run of notebook 04 on a Kaggle GPU, and prints the commit Kaggle ran and
+   both models' answers to a test question.
+
+Use `--no-kaggle-test` to skip step 4. Only a run started from the Kaggle **editor** lasts 90 minutes; a
+test run from this script stops after 1 minute.
+
+*Why not Hugging Face Spaces?* Hosting a Gradio app on Hugging Face's free CPU now requires a paid PRO
+subscription, so we use Kaggle, which has a free GPU.
 
 ## 8. Reproduce the experiments (Kaggle)
 
 All GPU work ran on a free Kaggle T4; every run is logged in [`docs/KAGGLE_RUNS.md`](docs/KAGGLE_RUNS.md).
 Requirements:
 - Kaggle CLI 2.x with `KAGGLE_USERNAME` and `KAGGLE_API_TOKEN` set.
-- For the adapter upload, `HF_TOKEN` with write access.
+- For the adapter upload, `HF_TOKEN` with write access (the adapter repo is public; downloading needs no token).
 
 **0. Local CPU tests** (needs a local Spider copy):
 ```bash
@@ -401,7 +417,7 @@ app/                 Gradio demo (app.py) + back-end with safe execution (sqlbud
 sample_db/           university.db + its generator script
 results/             metrics, predictions, comparison, statistics, charts, error analysis
 tests/               41 pytest tests (pipeline, statistics, demo safety)
-scripts/             upload_src.sh (code -> Kaggle dataset), upload_adapter.py (adapter -> HF)
+scripts/             deploy.sh (one-command check + Kaggle test), upload_src.sh (code -> Kaggle dataset), upload_adapter.py (adapter -> HF)
 docs/                PLAN, PROGRESS, DECISIONS (with reasons + alternatives), KAGGLE_RUNS
 PRESENTATION_NOTES.md  10-slide outline
 ```

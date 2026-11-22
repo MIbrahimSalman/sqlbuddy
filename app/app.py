@@ -96,7 +96,7 @@ def model_status() -> str:
     dev = html.escape(MODELS.describe())
     if s == "ready" and not MODELS.has_adapter:
         ad = badge("error", "Fine-tuned adapter unavailable") + \
-            " <small>(private HF repo: log in with a token that has access; Base mode still works)</small>"
+            " <small>(could not download it from Hugging Face: check the internet connection; Base mode still works)</small>"
     elif s == "ready":
         ad = badge("done", "Fine-tuned adapter loaded")
     else:

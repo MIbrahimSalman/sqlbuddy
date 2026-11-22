@@ -123,3 +123,11 @@ fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on l
 - [x] Per-database breakdown of the dev results (`results/per_database.csv`, `exec_acc_by_database.png`).
 - [x] Out-of-domain test: 30 hand-written questions on `university.db`, gold SQL fixed before running the models (`sample_db/university_test.json`, `src/ood_eval.py`, `results/ood/`).
 - [x] Slide deck (claude.ai Slides artifact, exportable to PowerPoint/PDF) + updated PRESENTATION_NOTES / README.
+
+## Phase 8 — Hosting the demo + one-command updates (self-approved, user request 2026-11-22)
+- [x] Adapter repo on Hugging Face made **public** (user OK) → no login/token needed anywhere.
+- [x] Hugging Face Space: attempted, **refused** (Gradio Spaces on free CPU now need a PRO subscription). User chose Kaggle only (free GPU).
+- [x] Notebook 04 downloads the app from **GitHub main** at the start of every run (prints the commit), adapter from the public HF repo → every merged design change reaches Kaggle automatically. No Kaggle inputs needed anymore.
+- [x] Run length: editor "Run all" (Interactive) = 90 min; CLI push (Batch) = self-test + 1 min.
+- [x] `scripts/deploy.sh`: tests → check commit is in GitHub main → refresh `sqlbuddy-src` → Kaggle test run of notebook 04, printing the commit Kaggle ran + both models' answers.
+- [x] Docs: README §7, GUIDE, PROGRESS, DECISIONS, KAGGLE_RUNS, CLAUDE.md.

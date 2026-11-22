@@ -33,7 +33,7 @@ from src.schema import get_schema_ddl  # noqa: E402
 from src.sql_extract import _cut_at_semicolon, extract_sql  # noqa: E402
 
 BASE_MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
-# LoRA adapter: HF repo id (private -> needs HF_TOKEN / `hf auth login`) or a local folder.
+# LoRA adapter: public HF repo id (downloaded automatically, no login needed) or a local folder.
 ADAPTER = os.environ.get("SQLBUDDY_ADAPTER", "ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora")
 SAMPLE_DB = ROOT / "sample_db" / "university.db"
 MAX_ROWS = 200
@@ -191,7 +191,7 @@ class Models:
                 try:
                     from peft import PeftModel
                     self.model = PeftModel.from_pretrained(base, ADAPTER).eval()
-                except Exception as e:  # e.g. no HF token for the private adapter -> base model still works
+                except Exception as e:  # e.g. no internet -> the base model still works
                     self.adapter_error = f"{type(e).__name__}: {e}"
                     self.model = base
                 self.state = "ready"
