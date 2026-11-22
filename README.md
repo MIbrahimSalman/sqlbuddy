@@ -14,6 +14,8 @@ questions over 20 databases the model never saw in training**, whether fine-tuni
 
 ---
 
+> **New to the project?** Start with [`docs/GUIDE.md`](docs/GUIDE.md): what was done, what ran on Kaggle vs. locally, a checklist, and how to evaluate.
+
 ## Contents
 1. [Problem](#1-problem)
 2. [Data](#2-data)

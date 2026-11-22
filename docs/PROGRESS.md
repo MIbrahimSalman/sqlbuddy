@@ -1,5 +1,13 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Group guide
+
+**Done**
+- User asked for a summary: what has been done, how to run locally, what ran in the cloud, what to check and how to evaluate. Wrote `docs/GUIDE.md` (one page) and linked it from the README and CLAUDE.md.
+
+**Next steps**
+- Unchanged: fill in the deck's cover placeholders and share the deck; give group members HF read access; start the app early on presentation day.
+
 ## 2026-11-22 — Phase 7: demo redesign, latency investigation, extra evaluation, slide deck
 
 **User feedback:** everything works; improve the interface, explain why queries are slow, continue with evaluation and presentation.

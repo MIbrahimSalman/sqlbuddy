@@ -37,6 +37,7 @@ docs/        PLAN.md, PROGRESS.md, DECISIONS.md, KAGGLE_RUNS.md
 - Code is commented for presentation use (the group must explain it).
 
 ## Pointers
+- `docs/GUIDE.md` — one-page guide for the group (done so far, cloud vs local, checklist, evaluation)
 - `docs/PLAN.md` — phases, checklists, definition of done
 - `docs/PROGRESS.md` — running log + next steps
 - `docs/DECISIONS.md` — decisions with reasons/alternatives, user answers
