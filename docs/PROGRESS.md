@@ -1,5 +1,14 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Standing rule for Claude: run deploy.sh after code changes
+
+**Done**
+- At the user's request, added a "RULE: after every code change, run `scripts/deploy.sh`" section to `CLAUDE.md`, which Claude reads at the start of every session. After any change to `app/`, `src/`, `sample_db/`, the notebook builder or the requirements files, Claude must test, merge into `main`, run `bash scripts/deploy.sh` (it must end with `RESULT: OK`), log the Kaggle run and report the result. Changes to docs or results files alone skip it.
+- No new files, as requested. This change is docs-only, so deploy.sh was not run.
+
+**Next steps**
+- Unchanged: fill in the deck's cover placeholders and share the deck; on presentation day run notebook 04 from the Kaggle editor.
+
 ## 2026-11-22 — Phase 8: demo hosting on Kaggle (from GitHub main), public adapter, deploy.sh
 
 **Done**
