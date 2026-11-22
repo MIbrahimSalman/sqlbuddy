@@ -1,0 +1,56 @@
+{
+  "model": "base+lora(/kaggle/input/notebooks/mibrahimsalman022/sqlbuddy-02-train-lora/train/adapter)",
+  "n_examples": 1034,
+  "batch_size": 16,
+  "max_new_tokens": 256,
+  "decoding": "greedy",
+  "seconds": {
+    "load": 27,
+    "generate": 223,
+    "score": 18
+  },
+  "gpu": "Tesla T4",
+  "versions": {
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.22.1",
+    "peft": "0.21.2"
+  },
+  "metrics": [
+    {
+      "level": "easy",
+      "count": 248,
+      "exec_acc": 88.31,
+      "exact_match": 88.71,
+      "valid_sql": 98.79
+    },
+    {
+      "level": "medium",
+      "count": 446,
+      "exec_acc": 74.66,
+      "exact_match": 67.94,
+      "valid_sql": 91.03
+    },
+    {
+      "level": "hard",
+      "count": 174,
+      "exec_acc": 63.79,
+      "exact_match": 54.02,
+      "valid_sql": 92.53
+    },
+    {
+      "level": "extra",
+      "count": 166,
+      "exec_acc": 56.02,
+      "exact_match": 51.81,
+      "valid_sql": 82.53
+    },
+    {
+      "level": "all",
+      "count": 1034,
+      "exec_acc": 73.11,
+      "exact_match": 67.99,
+      "valid_sql": 91.78
+    }
+  ]
+}

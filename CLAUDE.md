@@ -11,7 +11,7 @@ University NLP course project: fine-tune a small LLM to translate English questi
 - Data: Spider 1.0. Train = `train_spider.json` (7,000) minus a small validation split; **test = dev (1,034), never trained on**.
 - Spider SQLite DBs: Kaggle dataset `jeromeblanchet/yale-universitys-spider-10-nlp-dataset` (original release, contains `spider/database/`), attached as kernel input.
 - Prompt: schema as canonical CREATE TABLE statements (from PRAGMA metadata) + question → SQL only. Identical prompt for base and fine-tuned.
-- Status: Phase 1 done — base EX 56.96 / EM 32.40 / valid 76.60 (`results/baseline/`). Phase 2 done — adapter on HF, logs in `results/training/`.
+- Status: Phases 0–4 done. Dev (1,034): base EX 56.96 / EM 32.40 / valid 76.60 → fine-tuned EX 73.11 / EM 67.99 / valid 91.78 (McNemar p = 2.4e-25). See `results/`. Adapter on HF, logs in `results/training/`.
 - Decoding: greedy, `max_new_tokens=256`, batched, then SQL extraction post-processing.
 - Metrics: execution accuracy (primary), exact match (Spider official exact-set-match), valid-SQL rate; all by Spider hardness (easy/medium/hard/extra) via vendored official `evaluation.py`.
 - GPU work runs only on Kaggle (pushed with the `kaggle` CLI). Adapter goes to HF Hub `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora` (private).

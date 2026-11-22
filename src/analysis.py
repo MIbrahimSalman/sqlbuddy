@@ -139,6 +139,10 @@ def error_tables(base: pd.DataFrame, ft: pd.DataFrame, out: Path, n_sample=50, s
     frac = n_sample / len(wrong)
     parts = [wrong[wrong.hardness == lv] for lv in LEVELS[:4]]
     sample = pd.concat([d.sample(max(1, round(len(d) * frac)), random_state=seed) for d in parts if len(d)])
+    # rounding per level can leave us 1-2 short (or over): top up from the remaining failures
+    if len(sample) < n_sample:
+        rest = wrong.drop(sample.index)
+        sample = pd.concat([sample, rest.sample(n_sample - len(sample), random_state=seed)])
     sample = sample.head(n_sample)
     keep = ["id", "db_id", "hardness", "question", "gold_sql", "pred_sql", "pred_error", "auto_category"]
     sample[keep].assign(manual_category="", note="").to_csv(out / "error_sample.csv", index=False)

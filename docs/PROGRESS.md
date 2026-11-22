@@ -1,5 +1,24 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Phases 3 + 4 complete: fine-tuning beats the base model
+
+**Results (Spider dev, 1,034 held-out questions)**
+| | EX | EM | valid SQL |
+|---|---|---|---|
+| base | 56.96 | 32.40 | 76.60 |
+| fine-tuned | **73.11** | **67.99** | **91.78** |
+- EX +16.15 pp (95 % paired bootstrap CI 13.2–19.1); 220 fixes vs 53 regressions; exact McNemar p = 2.4e-25; significant at every level (extra: +9.6 pp, p = 0.014; hard: +24.1 pp).
+
+**Done**
+- 03 smoke (50) then full run; outputs in `results/finetuned/`. `src.compare` → `comparison.csv`, `flips.csv`, `statistics.json`.
+- `src.analysis` → 3 bar charts + loss curve, `error_types.csv`; fixed sample rounding (49 → exactly 50 rows).
+- Manual labels for 50 FT failures in `error_sample.csv`; `results/error_analysis.md` (fixes, 5+5 examples, regressions, limitations).
+- Key insights: alias errors (`no such column: T2.x`) 201 → 61; FT copies Spider style (0 % INNER JOIN, 0.54 joins/query ≈ gold 0.50) → EM gain (+35.6) partly style; remaining bottleneck = schema linking (27/50) + cell values never seen (5/50); 2/50 gold/eval artifacts; EX false positive example test_197.
+
+**Next steps**
+1. Phase 5: demo test with the HF adapter (CPU, base + fine-tuned, Compare mode); optional 04 GPU notebook check.
+2. Phase 6: README (mermaid, results, charts, limitations, reproduction, demo commands), `PRESENTATION_NOTES.md`.
+
 ## 2026-11-22 — Phase 2 complete: LoRA adapter trained and uploaded
 
 **Done**
