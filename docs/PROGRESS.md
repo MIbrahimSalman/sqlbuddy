@@ -1,5 +1,16 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Slide deck finalised
+
+**Done**
+- Cover: Fatima Malik (23L-0826), Mohammad Ibrahim Salman (23L-0723), CS4063 – Natural Language Processing. The date was removed, as the user asked.
+- Demo slide (13) now describes the Kaggle GPU demo (~1–4 s per question, public link, latest app from GitHub), with the laptop CPU as a fallback. The speaker notes have the Kaggle steps.
+- PRESENTATION_NOTES.md and GUIDE.md updated to match. Docs-only change, so deploy.sh was not run.
+
+**Next steps**
+- Share the deck from its Share menu (and optionally export it as PowerPoint/PDF for an offline copy).
+- Presentation day: start notebook 04 from the Kaggle editor about 5 minutes early.
+
 ## 2026-11-22 — Standing rule for Claude: run deploy.sh after code changes
 
 **Done**

@@ -118,7 +118,7 @@ Install and run the demo on a laptop:
   - `results/exec_acc_by_database.png`
 
 **Presentation**
-- [ ] Slide deck: https://claude.ai/artifact/GVSZ3uR7kogY9rAMugzxJH. Fill in the cover placeholders (group members, course, date) and share it from its Share menu, or others can't open it.
+- [ ] Slide deck: https://claude.ai/artifact/GVSZ3uR7kogY9rAMugzxJH. The cover is filled in (names, roll numbers, CS4063). Share it from its Share menu, or others can't open it.
 - [ ] [`PRESENTATION_NOTES.md`](../PRESENTATION_NOTES.md): slide-by-slide notes, a demo script and backup Q&A.
 
 ---
