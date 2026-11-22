@@ -1,0 +1,10 @@
+# Minimal requirements to run the Gradio demo on a laptop CPU (Windows / macOS / Linux, Python 3.11-3.13).
+# On Windows/Linux, install the smaller CPU-only torch first:
+#   pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1
+transformers==5.22.1
+peft==0.21.2
+accelerate==1.15.0
+huggingface_hub==2.4.0
+gradio==6.31.0
+pandas==3.1.0

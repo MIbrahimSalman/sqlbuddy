@@ -1,5 +1,17 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Phases 5 + 6: demo verified, README + presentation notes
+
+**Done**
+- Demo tested end-to-end on CPU with the private HF adapter (`Compare both` on all 6 examples): FT correct on 4/6, base on 2/6; both fail "students per department" (honest schema-linking example). DROP is blocked. UI served via HTTP; screenshot `results/demo_screenshot.png`.
+- Demo polish: "(no result)" table instead of a dummy header, floats rounded to 2 decimals, wrapped + height-capped SQL boxes (CSS passed to `launch()`, Gradio 6).
+- Notebook 04: self-test cell (one question through both models), prints `PUBLIC LINK`, `--smoke 04` = 1-minute run.
+- `requirements-demo.txt` (minimal laptop install). README (mermaid pipeline, data, method, results, error summary, limitations, Windows/macOS demo, Kaggle reproduction, layout) and `PRESENTATION_NOTES.md` (10 slides + Q&A).
+
+**Next steps**
+- Optional: grant group members read access to the HF adapter repo (or make it public) so they can run the fine-tuned demo on their laptops.
+- Before presenting: run `04_demo` (full, 90 min) as the GPU backup and rehearse with the demo questions in README §7.
+
 ## 2026-11-22 — Phases 3 + 4 complete: fine-tuning beats the base model
 
 **Results (Spider dev, 1,034 held-out questions)**

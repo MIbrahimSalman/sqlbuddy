@@ -103,7 +103,7 @@ fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on l
 - [ ] `results/error_analysis.md`: category table + discussion; 5 fixed-by-FT examples and 5 still-wrong (question, gold, base pred, FT pred, why); regressions (correct→wrong) with examples; error-type shift base vs FT (e.g. fewer "no such column"); caveats (accidental EX matches, EM vs EX disagreements).
 - Done when: all charts + error_analysis.md exist and numbers match comparison.csv.
 
-## Phase 5 — Demo (plan approved)
+## Phase 5 — Demo ✅
 - [ ] `sample_db/make_university_db.py` (fixed seed, stdlib only) → `sample_db/university.db`: tables `students`, `teachers`, `courses` (FK teacher), `enrollments` (student, course, semester), `grades` (enrollment, score, letter); ~150 rows in total; realistic names/departments.
 - [ ] `app/sqlbuddy_core.py`: model manager (lazy-load base; FT = base + adapter from HF `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora` via PEFT; keeps both loaded, using `disable_adapter()` for base → only one copy of the weights in RAM, ~6 GB fp32); `safe_select()`: single statement, must start with SELECT/WITH, rejects ; chains / PRAGMA / ATTACH etc., executes via `src.execution` read-only with timeout and row cap (200).
 - [ ] `app/app.py` (Gradio 6.31): DB choice (sample / upload .sqlite/.db), schema view, question box + example questions, Base / Fine-tuned radio, outputs: generated SQL, result table, timing, error message. Reuses `src/schema.py` + `src/prompts.py` + `src/sql_extract.py` → identical prompt to evaluation.
@@ -111,7 +111,7 @@ fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on l
 - [ ] `notebooks/04_demo/`: same app on GPU, `share=True` public link, adapter taken from the 02 kernel output (no token needed); runs until stopped / session timeout.
 - [ ] Tests: unit tests for `safe_select`; CPU smoke test here (load model, 2 questions on university.db, base and FT).
 
-## Phase 6 — Documentation
-- [ ] README.md: problem, why text-to-SQL, dataset, method + mermaid pipeline, training setup, results table + charts, error analysis summary, limitations, reproduction (Kaggle steps), demo on Windows/Mac.
-- [ ] `PRESENTATION_NOTES.md`: 10-slide outline with key numbers/charts.
-- [ ] Final summary to user: results table, file list, laptop demo commands.
+## Phase 6 — Documentation ✅
+- [x] README.md: problem, why text-to-SQL, dataset, method + mermaid pipeline, training setup, results table + charts, error analysis summary, limitations, reproduction (Kaggle steps), demo on Windows/Mac.
+- [x] `PRESENTATION_NOTES.md`: 10-slide outline with key numbers/charts.
+- [x] Final summary to user: results table, file list, laptop demo commands.
