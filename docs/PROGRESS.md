@@ -5,6 +5,7 @@
 **Done**
 - Demo tested end-to-end on CPU with the private HF adapter (`Compare both` on all 6 examples): FT correct on 4/6, base on 2/6; both fail "students per department" (honest schema-linking example). DROP is blocked. UI served via HTTP; screenshot `results/demo_screenshot.png`.
 - Demo polish: "(no result)" table instead of a dummy header, floats rounded to 2 decimals, wrapped + height-capped SQL boxes (CSS passed to `launch()`, Gradio 6).
+- Notebook 04 verified on a T4 (smoke v1): adapter loads, self-test identical to CPU, public link works.
 - Notebook 04: self-test cell (one question through both models), prints `PUBLIC LINK`, `--smoke 04` = 1-minute run.
 - `requirements-demo.txt` (minimal laptop install). README (mermaid pipeline, data, method, results, error summary, limitations, Windows/macOS demo, Kaggle reproduction, layout) and `PRESENTATION_NOTES.md` (10 slides + Q&A).
 
