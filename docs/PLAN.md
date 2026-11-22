@@ -80,7 +80,7 @@ Estimated ~1 h. **Actual: 8 min total** (smoke 2 min, full 6 min; generation 0.2
 3. Full run; download adapter; reload it locally on CPU and generate 2 queries as a check.
 
 ### Expected Kaggle GPU time
-Smoke ~10 min. Full: estimate ~1–2 h (≈10k tokens/step × 830 steps on a T4 with gradient checkpointing, + 8 val evals). Measured in the smoke run.
+**Measured in smoke run: 10.96 s/step, 5.4 GB peak → full run ≈ 820 steps ≈ 2.5 h (under the 3 h auto-go threshold).** Original estimate: smoke ~10 min. Full: ~1–2 h (≈10k tokens/step × 830 steps on a T4 with gradient checkpointing, + 8 val evals). Measured in the smoke run.
 
 ### Risks
 fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on long examples (reduce per-device batch to 2, grad-accum 8); Kaggle 12 h limit (far away; checkpoints anyway).

@@ -18,9 +18,13 @@ SPIDER_DATASET = "jeromeblanchet/yale-universitys-spider-10-nlp-dataset"
 SRC_DATASET = f"{USER}/sqlbuddy-src"
 
 # Exact library versions used on Kaggle (torch comes preinstalled in the Kaggle image).
-PIP = ("pip install -q transformers==5.22.1 peft==0.21.2 accelerate==1.15.0 datasets==5.1.0 "
+PIP = ("%pip install -q transformers==5.22.1 peft==0.21.2 accelerate==1.15.0 datasets==5.1.0 "
        "huggingface_hub==2.4.0 nltk==3.9.2")
-PIP_TRAIN = PIP + " trl==1.17.1 matplotlib==3.11.2"
+# The Kaggle image ships torchao 0.10, which PEFT 0.21 rejects ("incompatible version of torchao")
+# as soon as LoRA layers are created. We don't use torchao, so remove it for notebooks that use PEFT.
+NO_TORCHAO = "%pip uninstall -y -q torchao\n"
+PIP_TRAIN = NO_TORCHAO + PIP + " trl==1.17.1 matplotlib==3.11.2"
+PIP_PEFT = NO_TORCHAO + PIP
 
 SETUP = r'''
 # Locate our shared code (Kaggle dataset "sqlbuddy-src") and the Spider databases, then import.
@@ -58,7 +62,7 @@ def code(text):
     return {"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": text.strip()}
 
 
-def write(slug, title, cells, datasets, gpu=True):
+def write(slug, title, cells, datasets, gpu=True, kernels=()):
     folder = HERE / slug
     folder.mkdir(exist_ok=True)
     for i, c in enumerate(cells):  # nbformat >= 4.5 wants a unique id per cell
@@ -75,7 +79,7 @@ def write(slug, title, cells, datasets, gpu=True):
         "code_file": f"{slug}.ipynb", "language": "python", "kernel_type": "notebook",
         "is_private": "true", "enable_gpu": "true" if gpu else "false", "enable_tpu": "false",
         "enable_internet": "true", "dataset_sources": datasets, "competition_sources": [],
-        "kernel_sources": [], "model_sources": [],
+        "kernel_sources": list(kernels), "model_sources": [],
     }
     (folder / "kernel-metadata.json").write_text(json.dumps(meta, indent=2))
     print("wrote", folder)
@@ -144,9 +148,46 @@ display(pd.read_csv("/kaggle/working/train/loss_history.csv").tail(20))
     ]
 
 
+def nb03(smoke: bool):
+    n = 50 if smoke else None
+    return [
+        md("""
+# SQLBuddy 03 - Fine-tuned model evaluation
+Same prompts, same greedy decoding (max 256 new tokens), same metrics and the same Spider dev set as
+notebook 01 - the only difference is the LoRA adapter from notebook 02 (attached as kernel input),
+merged into the base model.
+"""),
+        code(PIP_PEFT),
+        code(SETUP),
+        code("""
+# The adapter = output folder 'train/adapter' of the 02_train_lora kernel.
+ADAPTER = os.path.dirname([p for p in glob.glob("/kaggle/input/**/adapter_config.json", recursive=True)
+                           if "checkpoint" not in p][0])
+print("adapter:", ADAPTER, os.listdir(ADAPTER))
+"""),
+        code(f"""
+N_EXAMPLES = {n!r}
+from src.run_eval import main
+args = ["--out", "/kaggle/working/finetuned", "--adapter", ADAPTER, "--batch-size", "16",
+        "--max-new-tokens", "256", "--spider-root", str(SPIDER_ROOT)]
+if N_EXAMPLES:
+    args += ["--n", str(N_EXAMPLES)]
+main(args)
+"""),
+        code("""
+import pandas as pd
+display(pd.read_csv("/kaggle/working/finetuned/metrics.csv"))
+pred = pd.read_csv("/kaggle/working/finetuned/predictions.csv")
+display(pred[["question", "gold_sql", "pred_sql", "hardness", "exec_match", "exact_match", "valid_sql"]].head(15))
+"""),
+    ]
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", nargs="*", default=[], help="notebook numbers to build in smoke-test mode")
     a = ap.parse_args()
     write("01_baseline_eval", "Baseline eval", nb01("01" in a.smoke), [SPIDER_DATASET, SRC_DATASET])
     write("02_train_lora", "Train LoRA", nb02("02" in a.smoke), [SPIDER_DATASET, SRC_DATASET])
+    write("03_finetuned_eval", "Fine-tuned eval", nb03("03" in a.smoke), [SPIDER_DATASET, SRC_DATASET],
+          kernels=[f"{USER}/sqlbuddy-02-train-lora"])

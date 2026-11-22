@@ -1,5 +1,23 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Phase 2 in progress: full LoRA training running on Kaggle
+
+**Done**
+- User answers: max_length 1536; auto-start the full run if the smoke estimate is ≤ 3 h; Phase 2 plan approved.
+- `src/train.py` (TRL SFTTrainer, prompt–completion data, completion-only loss, LoRA r16/a32, loss logger + curve), CPU-tested with a tiny Qwen2 model.
+- Notebook 02 + notebook 03 (fine-tuned eval, adapter taken from the 02 kernel output) + `scripts/upload_adapter.py` (HF upload).
+- Smoke run (30 steps): 10.96 s/step, 5.41 GB peak memory, loss 0.221 → 0.203, val loss 0.197. 6,560 train / 352 val (88 dropped > 1536 tokens). Full run launched (~2.5 h, kernel v4).
+
+**Problems & fixes**
+- Kaggle image ships torchao 0.10 → PEFT raises ImportError when creating LoRA layers → `%pip uninstall -y torchao` in notebooks 02/03.
+- Multi-line cell with bare `pip` lines → SyntaxError (auto-magic only for single-line cells) → explicit `%pip`; all notebook cells are now parse-checked locally with IPython before pushing.
+- Note: base model's initial SQL loss is already low (~0.22/token) → consistent with Spider being seen in pre-training.
+
+**Next steps**
+1. When kernel v4 finishes: download outputs (adapter outside git; loss_history.csv + loss_curve.png + train_info.json → `results/training/`).
+2. Sanity-check the adapter on CPU (load base + adapter, 2 dev questions); upload to HF with `python scripts/upload_adapter.py <adapter> --train-info ... --loss-png ...`.
+3. Phase 3: push `03_finetuned_eval` (smoke 50 → full), build `results/comparison.csv`.
+
 ## 2026-11-21 — Phase 1 complete: base model evaluation
 
 **Done**
