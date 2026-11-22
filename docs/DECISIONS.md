@@ -56,3 +56,10 @@ Format: decision — reason — alternatives considered. User answers are marked
 - **One generation at a time** (shared weights): a lock; other requests show "Queued". Compare mode = two sequential generations (base, then fine-tuned), stated in the UI.
 - **Out-of-domain test set written before running either model**, on our own DB, scored with the same EX rules and official hardness. It is small (30), so it is reported as supporting evidence with an exact McNemar test, not as a main result.
 - **Slide deck as a claude.ai Slides artifact** (download as .pptx / PDF) using the chart palette (base = blue, fine-tuned = orange); group names / course / date left as placeholders.
+
+## Phase 8 (2026-11-22)
+- **(user) Adapter repo made public** ("no issue in that"). Replaces the earlier "keep private + token" answer. Effect: laptops, Kaggle and any host load the adapter without a token.
+- **Hugging Face Space dropped.** `create_repo(space_sdk="gradio")` returned 402: "hosting Gradio and Docker Spaces on free cpu-basic requires a PRO subscription". Only static Spaces are free. **(user) chose "Kaggle only, free"** over HF PRO (~$9/month) or another cloud (e.g. Modal; more setup).
+- **Single source of demo code = GitHub main.** Notebook 04 downloads `archive/<sha>.zip` of main (resolving the sha via the GitHub API and printing it) instead of using the `sqlbuddy-src` dataset or the training kernel output. Reason: the user wants every interface change to show up on Kaggle without manual steps; a merge is enough. The adapter comes from the public HF repo (identical to the kernel-output adapter we uploaded).
+- **Notebook 04 run length depends on how it was started** (`KAGGLE_KERNEL_RUN_TYPE`): Interactive (editor "Run all") = 90 min, Batch (CLI push, i.e. deploy.sh tests) = 1 min, so test runs don't burn GPU quota and the editor version is always the full demo.
+- **`scripts/deploy.sh` refuses to run** with uncommitted changes, with a commit not yet merged into main (Kaggle would run old code), or while notebook 04 is running (it might be someone's live demo).

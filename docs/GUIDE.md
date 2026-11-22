@@ -16,7 +16,7 @@ Details live in the files linked at each point.
 |---|---|---|
 | 0 | Environment check, repo scaffolding, `.gitignore` for tokens/weights/data | — |
 | 1 | Data pipeline + **base model evaluation** on Spider dev (1,034 questions, 20 unseen DBs) | EX 57.0 %, `results/baseline/` |
-| 2 | **LoRA fine-tuning** of Qwen2.5-Coder-1.5B-Instruct (r 16, 2 epochs, 820 steps, 2 h 10 min on a T4) | adapter on Hugging Face (private), `results/training/` |
+| 2 | **LoRA fine-tuning** of Qwen2.5-Coder-1.5B-Instruct (r 16, 2 epochs, 820 steps, 2 h 10 min on a T4) | adapter on Hugging Face (public), `results/training/` |
 | 3 | **Fine-tuned evaluation** on the same 1,034 questions, same prompt and decoding | EX 73.1 %, `results/finetuned/` |
 | 4 | **Comparison and analysis**: McNemar test, bootstrap CI, charts, 50 failures labelled by hand | `results/comparison.csv`, `statistics.json`, `error_analysis.md` |
 | 5 | **Demo**: Gradio app (read-only, SELECT only), sample `university.db`, Kaggle GPU notebook | `app/`, `sample_db/`, `notebooks/04_demo` |
@@ -48,13 +48,25 @@ All GPU work ran on a free **Kaggle T4** through the `kaggle` CLI. Every run is 
 | `sqlbuddy-01-baseline-eval` | base model on 1,034 dev questions (~6 min) | `results/baseline/` |
 | `sqlbuddy-02-train-lora` | LoRA training (~2 h 10 min) | adapter + training logs |
 | `sqlbuddy-03-finetuned-eval` | fine-tuned model on the same 1,034 questions (~5 min) | `results/finetuned/` |
-| `sqlbuddy-04-demo` | the demo on a GPU with a public `gradio.live` link (backup for the presentation) | link printed in the notebook |
+| `sqlbuddy-04-demo` | **the demo for the presentation**: the same app on a GPU, with a public `gradio.live` link | link printed in the last cell |
 
 **Supporting services:**
 - **Kaggle dataset `sqlbuddy-src`** carries our `src/` and `app/` code into the notebooks.
 - **Kaggle dataset `yale-universitys-spider-10-nlp-dataset`** provides the Spider SQLite databases.
-- **Hugging Face, private repo `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora`**, holds the trained
-  adapter (74 MB). Weights are never stored in git.
+- **Hugging Face, public repo `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora`**, holds the trained
+  adapter (74 MB). Anyone can download it without a login. Weights are never stored in git.
+- **GitHub `main`** is the source of the demo code. Notebook 04 downloads the app from GitHub at the start of
+  every run, so the Kaggle demo always shows the latest merged design.
+
+### Showing the app without installing anything: Kaggle notebook 04
+1. Log in at kaggle.com, then open **Your Work → Code → `sqlbuddy-04-demo` → Edit**.
+2. In the right panel, set **GPU T4** and **Internet on**.
+3. Click **Run all**. After 3–5 minutes the last cell prints `PUBLIC LINK: https://….gradio.live`.
+4. The link works for anyone for **90 minutes**, at about 1–4 s per question. Press **Stop** when finished.
+   Kaggle gives about 30 free GPU hours per week.
+
+Hugging Face Spaces was considered, but running a Gradio app on its free CPU now needs a paid PRO
+subscription, so Kaggle is our free hosting.
 
 ### Locally: CPU only, no GPU needed
 
@@ -65,14 +77,12 @@ All GPU work ran on a free **Kaggle T4** through the `kaggle` CLI. Every run is 
 | Comparison + statistics | `python -m src.compare results/baseline results/finetuned results` | seconds |
 | Charts + error tables + per-DB | `python -m src.analysis results/baseline results/finetuned results/training results` | seconds |
 | Out-of-domain test | `python -m src.ood_eval` | ~15 min on a 4-core CPU |
+| **After changing the app** | merge into `main`, then `bash scripts/deploy.sh` | ~5 min, including a Kaggle test run |
 
 Install and run the demo on a laptop:
 - The full commands for Windows and macOS are in [README §7](../README.md#7-run-the-demo-on-your-laptop-windows--macos).
 - In short: create a venv, then `pip install -r requirements-demo.txt` (on Windows, install CPU torch first),
-  then log in to Hugging Face, then `python app/app.py`.
-- **Hugging Face login.** You need a read token from an account with access to the private adapter repo. If
-  `hf auth login` is not found, use `python -m huggingface_hub.cli.hf auth login`, or set `HF_TOKEN` in the
-  terminal. Without access, only the Base model works.
+  then `python app/app.py`. No Hugging Face login is needed: the adapter is public.
 - **Why it is slower than on Kaggle.** The CPU runs the whole model once per generated token (~0.16 s per
   token). See [`docs/PERFORMANCE.md`](PERFORMANCE.md).
 
@@ -81,8 +91,8 @@ Install and run the demo on a laptop:
 ## 3. What to check (checklist)
 
 **Demo (before the presentation)**
-- [ ] `python app/app.py` starts, and the status bar turns from *Loading model…* to **Model ready**, showing **Fine-tuned adapter loaded**.
-      If it says *adapter unavailable*, fix the Hugging Face login.
+- [ ] The app (Kaggle link, or `python app/app.py` locally) shows **Model ready** and **Fine-tuned adapter loaded**.
+      If it says *adapter unavailable*, the internet connection to Hugging Face failed.
 - [ ] Choose **Compare both** and ask *"What is the average score in each course? Show the course title."*
   - Base should show **SQL error** (`no such column: T2.title`).
   - Fine-tuned should show **Done · 12 row(s)**.

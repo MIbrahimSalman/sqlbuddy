@@ -183,33 +183,46 @@ display(pred[["question", "gold_sql", "pred_sql", "hardness", "exec_match", "exa
     ]
 
 
-def nb04(smoke: bool):
-    minutes = 1 if smoke else 90
+def nb04(smoke: bool = False):
+    """GPU demo. The app code is downloaded from GitHub (branch main) at the start of every run,
+    so Kaggle always runs the latest merged app; the adapter comes from the public HF model repo.
+    Run length: started from the Kaggle editor ("Run all") = 90 min demo; pushed from the CLI
+    (a batch run, used only to test the notebook) = self-test + 1 min. `smoke` is kept for CLI
+    compatibility and has no effect."""
     return [
         md("""
-# SQLBuddy 04 - Live demo on GPU (backup for the presentation)
-Runs the same Gradio app as `app/app.py` on a Kaggle T4 and prints a public `gradio.live` link.
-The fine-tuned adapter comes from the `02_train_lora` kernel output (no Hugging Face token needed).
-**Use:** open this notebook in the Kaggle editor (GPU T4, Internet on) -> *Run all* -> open the
-`*.gradio.live` link printed below. The app stays up for `DEMO_MINUTES`.
+# SQLBuddy 04 - Live demo on a Kaggle GPU (fast backup for the presentation)
+Runs **the latest SQLBuddy app from GitHub** (the code is downloaded from the `main` branch at the
+start of every run, so every merged design change shows up here automatically; the fine-tuned adapter
+comes from the public Hugging Face model repo) on a T4 GPU: answers take ~1-4 s instead of 3-15 s on a laptop CPU.
+
+**Use:** open this notebook in the Kaggle editor -> right panel: *Accelerator = GPU T4*, *Internet = on*
+-> **Run all** -> after ~3-5 min the last cell prints `PUBLIC LINK: https://....gradio.live`.
+The link works for anyone for `DEMO_MINUTES` (90). Press *Stop* when you are done to save GPU quota.
 """),
         code(PIP_PEFT + " gradio==6.31.0"),
-        code(SETUP + r'''
-# demo app + sample database (shipped in the sqlbuddy-src dataset)
-core = glob.glob("/kaggle/input/**/sqlbuddy_core.py", recursive=True)[0]
-shutil.copytree(os.path.dirname(core), work + "/app", dirs_exist_ok=True)
-os.makedirs(work + "/sample_db", exist_ok=True)
-shutil.copy(glob.glob("/kaggle/input/**/university.db", recursive=True)[0], work + "/sample_db/")
-'''),
-        code("""
-ADAPTER = os.path.dirname([p for p in glob.glob("/kaggle/input/**/adapter_config.json", recursive=True)
-                           if "checkpoint" not in p][0])
-os.environ["SQLBUDDY_ADAPTER"] = ADAPTER   # read by app/sqlbuddy_core.py at import time
-sys.path.insert(0, work + "/app")
+        code(r'''
+# Download the latest app from GitHub (branch main): the single source of truth for the demo code.
+import io, json, os, shutil, sys, urllib.request, zipfile
+REPO, BRANCH = "MIbrahimSalman/sqlbuddy", "main"
+sha = json.load(urllib.request.urlopen(f"https://api.github.com/repos/{REPO}/commits/{BRANCH}"))["sha"]
+data = urllib.request.urlopen(f"https://github.com/{REPO}/archive/{sha}.zip").read()
+shutil.rmtree("/kaggle/working/sqlbuddy", ignore_errors=True)
+zf = zipfile.ZipFile(io.BytesIO(data))
+zf.extractall("/kaggle/working")
+work = os.path.join("/kaggle/working", zf.namelist()[0].rstrip("/"))   # sqlbuddy-<sha>/
+os.rename(work, "/kaggle/working/sqlbuddy"); work = "/kaggle/working/sqlbuddy"
+print("app version: github.com/%s commit %s" % (REPO, sha[:7]))
+sys.path.insert(0, os.path.join(work, "app"))
+
+import torch
+print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "none (enable GPU T4!)")
 import app as sqlbuddy_app
-sqlbuddy_app.MODELS.load()                 # load base + adapter on the GPU now, not on the first click
-print("adapter loaded:", sqlbuddy_app.MODELS.has_adapter, sqlbuddy_app.MODELS.adapter_error or "")
-"""),
+sqlbuddy_app.MODELS.load()                 # base model + public LoRA adapter, on the GPU
+sqlbuddy_app.MODELS.warm_up(sqlbuddy_app.schema_of(sqlbuddy_app.SAMPLE_DB))   # cache the sample schema prompt
+print("device:", sqlbuddy_app.MODELS.describe(), "| adapter loaded:", sqlbuddy_app.MODELS.has_adapter,
+      sqlbuddy_app.MODELS.adapter_error or "")
+'''),
         code("""
 # Self-test: one example question through both models (same code path as the UI button)
 q = "What is the average score in each course? Show the course title."
@@ -221,9 +234,12 @@ for ft in (False, True):
     print(df.head(3))
     print()
 """),
-        code(f"""
+        code("""
 import time
-DEMO_MINUTES = {minutes}
+# Started from the editor ("Interactive") -> 90 min demo; pushed from the CLI ("Batch") -> quick check.
+RUN_TYPE = os.environ.get("KAGGLE_KERNEL_RUN_TYPE", "Interactive")
+DEMO_MINUTES = 1 if RUN_TYPE == "Batch" else 90
+print("run type:", RUN_TYPE, "| demo minutes:", DEMO_MINUTES)
 demo = sqlbuddy_app.build_ui()
 demo.queue(default_concurrency_limit=8).launch(share=True, prevent_thread_lock=True, **sqlbuddy_app.LAUNCH_KW)
 print("PUBLIC LINK:", demo.share_url)      # open this *.gradio.live URL in any browser
@@ -241,4 +257,4 @@ if __name__ == "__main__":
     write("02_train_lora", "Train LoRA", nb02("02" in a.smoke), [SPIDER_DATASET, SRC_DATASET])
     write("03_finetuned_eval", "Fine-tuned eval", nb03("03" in a.smoke), [SPIDER_DATASET, SRC_DATASET],
           kernels=[f"{USER}/sqlbuddy-02-train-lora"])
-    write("04_demo", "Demo", nb04("04" in a.smoke), [SPIDER_DATASET, SRC_DATASET], kernels=[f"{USER}/sqlbuddy-02-train-lora"])
+    write("04_demo", "Demo", nb04(), [])  # no inputs: app comes from the HF Space, adapter from HF
