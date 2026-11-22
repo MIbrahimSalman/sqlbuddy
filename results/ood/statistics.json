@@ -1,0 +1,15 @@
+{
+  "n": 30,
+  "exec_acc_base": 36.67,
+  "exec_acc_ft": 73.33,
+  "wrong_to_correct": 11,
+  "correct_to_wrong": 0,
+  "mcnemar_exact_p": 0.0009765625,
+  "ci95_pp": [
+    20.0,
+    53.333333333333336
+  ],
+  "mean_seconds_base": 8.59,
+  "mean_seconds_ft": 8.68,
+  "device": "CPU (4 threads) \u00b7 fp32"
+}

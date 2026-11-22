@@ -225,7 +225,7 @@ for ft in (False, True):
 import time
 DEMO_MINUTES = {minutes}
 demo = sqlbuddy_app.build_ui()
-demo.launch(share=True, prevent_thread_lock=True, css=sqlbuddy_app.CSS)
+demo.queue(default_concurrency_limit=8).launch(share=True, prevent_thread_lock=True, **sqlbuddy_app.LAUNCH_KW)
 print("PUBLIC LINK:", demo.share_url)      # open this *.gradio.live URL in any browser
 time.sleep(DEMO_MINUTES * 60)
 demo.close()

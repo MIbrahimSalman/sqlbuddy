@@ -1,5 +1,33 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Phase 7: demo redesign, latency investigation, extra evaluation, slide deck
+
+**User feedback:** everything works; improve the interface, explain why queries are slow, continue with evaluation and presentation.
+
+**Done**
+- **UI** (`app/app.py`, `app/sqlbuddy_core.py`):
+  - three steps; DB card with table/row counts; upload validation; schema preview;
+  - Fine-tuned as the default; Compare panels side by side (stated as two generations);
+  - explicit states (loading / queued / generating / running SQL / done / SQL error / cancelled);
+  - device, mode, tokens and measured time; streamed SQL; Stop; Generate disabled while running; plain-language SQL errors;
+  - responsive at phone width (fixed a non-wrapping schema box);
+  - read-only protections unchanged.
+  - Tested with Playwright (compare, stop, upload, phone) and on a Kaggle T4 (04 v2).
+- **Latency** (`docs/PERFORMANCE.md`):
+  - Hardware-bound: ~0.16 s per token on 4 cores, scaling with core count; generation always stops at the end of the SQL.
+  - Added output-preserving speed-ups: background load + warm-up, prompt-prefix KV cache (first token 2.3 s → 0.6 s, identical output 8/8), streaming, MPS on Macs.
+  - Rejected: prompt-lookup decoding (50 % slower on CPU), int8 and smaller models (would change the evaluated model).
+- **Evaluation:**
+  - Per-database breakdown: 18 of 20 unseen DBs improve (`results/per_database.csv`, `exec_acc_by_database.png`).
+  - Out-of-domain test on our own DB (30 pre-written questions): base 36.7 % → fine-tuned 73.3 %, 11 fixed / 0 broken, McNemar p = 0.001 (`results/ood/`).
+- **Presentation:** 15-slide deck with speaker notes at https://claude.ai/artifact/GVSZ3uR7kogY9rAMugzxJH (private until shared; exports to PowerPoint/PDF). `PRESENTATION_NOTES.md` rewritten to match, with a demo script and Q&A.
+- Tests: 56 pass.
+
+**Next steps**
+- Fill in the cover placeholders (group members, course, date) and share the deck with the group.
+- Give group members read access to the HF adapter repo.
+- On presentation day: start the app early, or run `04_demo` (90 min) as the GPU backup.
+
 ## 2026-11-22 — Phases 5 + 6: demo verified, README + presentation notes
 
 **Done**

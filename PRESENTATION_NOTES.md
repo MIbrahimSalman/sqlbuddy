@@ -1,97 +1,66 @@
-# SQLBuddy: presentation outline (10 slides, about 12–15 min)
+# SQLBuddy: presentation notes (15 slides, about 15 min + demo)
 
-Every number comes from `results/` and `docs/`. The chart for each slide is named in *italics*.
+**Slide deck:** https://claude.ai/artifact/GVSZ3uR7kogY9rAMugzxJH (private until shared from its Share menu;
+it can be downloaded as PowerPoint or PDF). Speaker notes are attached to every slide.
 
----
+Before presenting:
+- Fill in the placeholders on the cover: `[Group members]`, `[Course name]`, `[Date]`.
+- Start the demo app a few minutes early (`python app/app.py`) and wait for **Model ready**.
 
-### 1. Title and the one-sentence result
-**SQLBuddy: asking databases in plain English with a fine-tuned small language model**
-- Claim: LoRA fine-tuning a 1.5 B model raises execution accuracy on unseen databases from **57.0 % to 73.1 %**.
-- Group names, course, date.
-- *Speaker note:* say the result first, then explain how we got it and why we trust it.
+Every number below comes from `results/`.
 
-### 2. Problem and motivation
-- People need data but can't write SQL. Text-to-SQL is semantic parsing: question + schema → executable query.
-- Large API models work but are costly and send your schema off-site. Can a **laptop-sized** model do it?
-- Research question: *does parameter-efficient fine-tuning measurably beat the same base model on held-out data?*
+| # | Slide | Key message / numbers | Visual |
+|---|---|---|---|
+| 1 | Title | Base 57.0 % → fine-tuned 73.1 % execution accuracy on unseen databases | big numbers |
+| 2 | Problem | Text-to-SQL = semantic parsing; can a laptop-sized model do it? | question → SQL example |
+| 3 | Research question | Controlled comparison: same model, prompt, decoding; held-out test; settings fixed in advance | 4 cards |
+| 4 | Data | Train 6,560 (132 DBs) / val 352 (8 held-out DBs) / test 1,034 (20 unseen DBs) / out-of-domain 30 | table + difficulty tags |
+| 5 | Method | One pipeline: schema → prompt → model → greedy decode → execute | flow diagram |
+| 6 | LoRA | 18.5 M trainable params (1.2 %), 2 epochs, 2 h 10 min on a T4; val loss best at step 200 | `loss_curve.png` |
+| 7 | Evaluation | Execution accuracy (primary), exact match, valid SQL; McNemar + bootstrap | cards |
+| 8 | Results | EX 57.0 → 73.1 (+16.2), EM 32.4 → 68.0, valid 76.6 → 91.8; hard +24.1 | `exec_acc_by_level.png` |
+| 9 | Significance | 220 fixed vs 53 broken; p = 2.4 × 10⁻²⁵; CI [+13.2, +19.1] | 2×2 flip table |
+| 10 | Per database | 18 of 20 DBs improve; largest +43.3 (course_teach), only drop −2.3 (pets_1) | `exec_acc_by_database.png` |
+| 11 | Out-of-domain | Own university.db, 30 questions: 36.7 → 73.3, 11 fixed / 0 broken, p = 0.001 | big numbers + table |
+| 12 | Error analysis | Alias errors 201 → 61; EM rises more than EX because of style; 27/50 remaining failures are schema linking | code examples + table |
+| 13 | Demo | Live Compare mode; read-only safety; ~0.16 s per token on CPU | `demo_screenshot.png` |
+| 14 | Limitations | One DB instance, contamination, epoch-2 over-fitting, schema only, single run, CPU speed | 6 cards |
+| 15 | Conclusion | +16.2 points, 18/20 DBs, 1.2 % of weights; remaining challenge = schema understanding | 3 numbers |
 
-### 3. Dataset: Spider
-- 200 databases in 138 domains, human-written question/SQL pairs, cross-domain by design.
-- Train: 6,560 pairs from 132 DBs (`train_spider.json` has 140; 8 are held out).
-- Validation: 352 pairs from 8 held-out DBs.
-- **Test: Spider dev, 1,034 questions from 20 DBs never seen in training.**
-- Difficulty levels: easy 248, medium 446, hard 174, extra 166.
-- Show one example: question → schema → gold SQL.
+## Demo script (slide 13)
 
-### 4. Method: model and prompt
-- Base model: Qwen2.5-Coder-1.5B-Instruct (code-pretrained, small enough for a CPU).
-- Prompt: system instruction + schema as `CREATE TABLE` (with PK/FK) + question → "SQL only".
-  - *The same prompt for both models*, so the only variable is the fine-tuning.
-- Show the pipeline diagram (mermaid in the README).
+1. Show the status bar: device, **Model ready**, adapter loaded.
+2. Pick **Compare both** and the example *"What is the average score in each course? Show the course title."*
+   - The base model fails with `no such column: T2.title`; the app explains it as a schema-linking error.
+   - The fine-tuned model returns 12 rows.
+   - Point at the measured time and the token count.
+3. Optional:
+   - Upload a Spider database, e.g. `concert_singer.sqlite`, and ask *"How many singers are there?"*
+   - Show that `DROP TABLE` is blocked.
+4. If the laptop is slow:
+   - Use short questions such as *"How many students are there?"*, about 3 s.
+   - Or use the Kaggle GPU notebook `04_demo` (public link).
+   - Or show the screenshot.
 
-### 5. Fine-tuning with LoRA
-- LoRA: freeze the 1.56 B weights and learn low-rank updates ΔW = BA (r = 16) on attention + MLP.
-  - That is **18.5 M trainable parameters (1.2 %)**, a 74 MB adapter.
-- Loss only on SQL tokens (prompt masked).
-- Training setup: 2 epochs, lr 2e-4 cosine, effective batch 16, fp16.
-  - Free Kaggle T4: **2 h 10 min**, 5.4 GB GPU memory.
-- *loss_curve.png*: training loss 0.26 → 0.04. Validation loss is best at step 200, then rises.
-  - Mention this honestly: it is over-fitting at the token level, and we come back to it on slide 9.
+## Backup Q&A
 
-### 6. Evaluation methodology
-- **Execution accuracy (primary):** run predicted and gold SQL and compare the result rows.
-- **Exact match:** the official Spider component match, values ignored.
-- **Valid-SQL rate:** the query runs without error.
-- Results broken down by difficulty.
-- Paired statistics: same 1,034 questions → McNemar test + bootstrap CI.
-- Every setting was fixed *before* testing; the test set was never used for any choice.
-
-### 7. Results
-- *exec_acc_by_level.png*: EX **57.0 → 73.1 (+16.2 pp)**, gains at every level.
-  - Hard improves most: +24.1.
-  - Extra improves least: +9.6.
-- Exact match 32.4 → 68.0; valid SQL 76.6 → 91.8 (*valid_sql_rate.png*).
-- Flip table: **220 fixed vs. 53 broken**, McNemar p = 2.4 × 10⁻²⁵, 95 % CI of the gain [+13.2, +19.1] pp.
-- *Speaker note:* the improvement is not luck. The confidence interval stays far away from zero.
-
-### 8. Error analysis: what changed and what is still hard
-- Fixes come from **broken SQL disappearing**.
-  - Wrong-alias errors (`no such column: T2.title`): 201 → 61.
-  - 62 % of the fixes were base queries that did not even run.
-- The model learned Spider's **style**: no `INNER JOIN`, about as many joins as the gold queries.
-  - This explains why EM jumps more than EX.
-- 50 failures reviewed by hand:
-  - **schema linking** (wrong table, join key or column): 27/50;
-  - nested or set logic: 6;
-  - unseen cell values (`'French'` vs `'France'`): 5;
-  - gold or evaluation errors: 2.
-- Show 1 fixed example (`test_515`, alias) and 1 still-wrong example (`test_115`, `country = 'USA'` but country is an id).
-
-### 9. Limitations and future work
-- One DB instance per question, so EX can accept a coincidentally correct query. Test-suite accuracy would be stricter.
-- Spider is public, so contamination is possible. It affects both models equally, so the *difference* stays fair.
-- Validation loss rose in epoch 2. Future work: early stopping or checkpoint selection on validation EX.
-- Future work on the prompt and data:
-  - add sample cell values to the prompt;
-  - test on harder benchmarks (BIRD, Spider 2.0);
-  - try other SQL dialects;
-  - run multiple seeds.
-
-### 10. Live demo and conclusion
-- Gradio app: choose a DB (sample `university.db` or upload your own), see the schema, ask a question, **Compare both**.
-- Demo question: *"What is the average score in each course? Show the course title."*
-  - Base fails with `no such column: T2.title`.
-  - Fine-tuned returns 12 rows.
-- Safety: read-only connection, SELECT-only, authorizer, timeout.
-- Runs on a laptop CPU (about 3–15 s per question). Backup: Kaggle GPU notebook with a public link (`04_demo`).
-- **Conclusion:** cheap LoRA fine-tuning (1.2 % of the weights, about 2 GPU-hours) gives a small open model
-  a large, statistically solid improvement in text-to-SQL. The remaining problem is understanding the
-  schema, not SQL syntax.
-
----
-
-**Backup slides / Q&A**
-- Why LoRA and not full fine-tuning? Memory: a full 1.5 B fine-tune with AdamW needs about 25 GB; LoRA needs 5.4 GB on a T4. It also avoids catastrophic forgetting.
-- Why a database-disjoint validation split? Test databases are unseen, so validation must be too. Otherwise the validation loss would be too optimistic.
-- Why execution accuracy as the primary metric? Different SQL can be equally correct. EM punishes valid alternatives and rewards style (see slide 8).
-- Demo fallback if Wi-Fi fails: `results/demo_screenshot.png`.
+- **Why LoRA and not full fine-tuning?**
+  - A full fine-tune of 1.5 B parameters with AdamW needs about 25 GB of GPU memory; LoRA needed 5.4 GB on a T4.
+  - It also limits catastrophic forgetting, and the adapter is only 74 MB.
+- **Why a database-disjoint validation split?** Test databases are unseen, so validation databases must be
+  too; otherwise validation loss would be optimistic.
+- **Why execution accuracy as the primary metric?** Different SQL can be equally correct. Exact match punishes
+  valid alternatives and rewards the annotators' style (slide 12).
+- **Why McNemar and not a t-test or chi-square on two proportions?** The two models answer the *same*
+  questions, so the samples are paired. Only the flipped questions carry information.
+- **Isn't the base model at a disadvantage on a Spider-style prompt?**
+  - Both models get the identical prompt.
+  - On our own database, which is not in Spider style, the gap is even larger (slide 11).
+- **Why does validation loss rise if accuracy improves?**
+  - Loss measures token-level confidence; execution accuracy measures whether the final answer is right.
+  - The model becomes over-confident on some tokens without getting more answers wrong overall.
+  - Early stopping on validation execution accuracy is future work.
+- **Why is it slow on a laptop?** The whole network runs once per generated token, about 0.16 s per token
+  on 4 CPU cores. It stops at the end of the SQL, so no time is wasted. See `docs/PERFORMANCE.md`.
+- **Is the demo safe on a real database?** It uses a read-only connection, a single SELECT only, an SQLite
+  authorizer that allows only reads, a 10 s limit and 200 rows at most.

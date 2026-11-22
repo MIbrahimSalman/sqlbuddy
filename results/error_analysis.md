@@ -184,3 +184,22 @@ work, because only the final adapter was pre-registered for testing.
   - The validation split (8 held-out train DBs) was only used to monitor loss.
   - No hyper-parameter search was run on the test set.
   - The plan fixed every setting before testing.
+
+## 7. Out-of-domain check (30 questions on our own university.db)
+
+Results are in `results/ood/`. The 30 questions and gold SQL were fixed before running the models.
+
+- **Result.**
+  - Base: 36.7 % execution accuracy; fine-tuned: 73.3 %.
+  - 11 questions fixed, 0 broken; exact McNemar p = 0.001.
+- **Same error pattern as on Spider, only stronger.** In 13 of the base model's 19 failures it joins an
+  extra table and then reads a column from the wrong alias (`SELECT T2.name FROM students AS T1 JOIN
+  enrollments AS T2 …`).
+- **The fine-tuned model's 8 failures are schema linking again:**
+  - an invented `departments` table;
+  - `enrollment_year` placed on `enrollments`;
+  - joining `grades.enrollment_id` to `students.student_id`;
+  - one value error: `semester = "Fall"` instead of `'Fall 2025'`.
+- **Takeaway.** The improvement is not specific to Spider's databases. The remaining weakness, linking the
+  question to the right tables and columns, is the same everywhere.
+
