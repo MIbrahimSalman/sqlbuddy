@@ -183,6 +183,43 @@ display(pred[["question", "gold_sql", "pred_sql", "hardness", "exec_match", "exa
     ]
 
 
+def nb04():
+    return [
+        md("""
+# SQLBuddy 04 - Live demo on GPU (backup for the presentation)
+Runs the same Gradio app as `app/app.py` on a Kaggle T4 and prints a public `gradio.live` link.
+The fine-tuned adapter comes from the `02_train_lora` kernel output (no Hugging Face token needed).
+**Use:** open this notebook in the Kaggle editor (GPU T4, Internet on) -> *Run all* -> open the
+`*.gradio.live` link printed below. The app stays up for `DEMO_MINUTES`.
+"""),
+        code(PIP_PEFT + " gradio==6.31.0"),
+        code(SETUP + r'''
+# demo app + sample database (shipped in the sqlbuddy-src dataset)
+core = glob.glob("/kaggle/input/**/sqlbuddy_core.py", recursive=True)[0]
+shutil.copytree(os.path.dirname(core), work + "/app", dirs_exist_ok=True)
+os.makedirs(work + "/sample_db", exist_ok=True)
+shutil.copy(glob.glob("/kaggle/input/**/university.db", recursive=True)[0], work + "/sample_db/")
+'''),
+        code("""
+ADAPTER = os.path.dirname([p for p in glob.glob("/kaggle/input/**/adapter_config.json", recursive=True)
+                           if "checkpoint" not in p][0])
+os.environ["SQLBUDDY_ADAPTER"] = ADAPTER   # read by app/sqlbuddy_core.py at import time
+sys.path.insert(0, work + "/app")
+import app as sqlbuddy_app
+sqlbuddy_app.MODELS.load()                 # load base + adapter on the GPU now, not on the first click
+print("adapter loaded:", sqlbuddy_app.MODELS.has_adapter, sqlbuddy_app.MODELS.adapter_error or "")
+"""),
+        code("""
+import time
+DEMO_MINUTES = 90
+demo = sqlbuddy_app.build_ui()
+demo.launch(share=True, prevent_thread_lock=True)   # prints the public *.gradio.live URL
+time.sleep(DEMO_MINUTES * 60)
+demo.close()
+"""),
+    ]
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", nargs="*", default=[], help="notebook numbers to build in smoke-test mode")
@@ -191,3 +228,4 @@ if __name__ == "__main__":
     write("02_train_lora", "Train LoRA", nb02("02" in a.smoke), [SPIDER_DATASET, SRC_DATASET])
     write("03_finetuned_eval", "Fine-tuned eval", nb03("03" in a.smoke), [SPIDER_DATASET, SRC_DATASET],
           kernels=[f"{USER}/sqlbuddy-02-train-lora"])
+    write("04_demo", "Demo", nb04(), [SPIDER_DATASET, SRC_DATASET], kernels=[f"{USER}/sqlbuddy-02-train-lora"])
