@@ -45,3 +45,6 @@ Format: decision — reason — alternatives considered. User answers are marked
 ## User answers during Phase 2 (2026-11-22)
 - **(user) Phases 3, 4 and 5 plans approved** to run back-to-back (status update after each; ask if something unexpected).
 - **(user) Adapter repo stays private**; the laptop demo authenticates with an HF read token (`HF_TOKEN` env var or `hf auth login`). Alternatives: public repo; local adapter folder.
+
+## User instruction (2026-11-22)
+- **(user) "Approve the tasks yourself and push and merge things to the GitHub repo by yourself."** From now on phase plans are self-approved (still documented in PLAN.md / DECISIONS.md), and finished work is merged into the default branch without asking.
