@@ -53,7 +53,7 @@ Estimated ~1 h. **Actual: 8 min total** (smoke 2 min, full 6 min; generation 0.2
 
 ---
 
-## Phase 2 — LoRA fine-tuning (plan approved; max_length 1536)
+## Phase 2 — LoRA fine-tuning ✅ (max_length 1536)
 
 ### Data
 - Train 6,648 / validation 352 (DB-disjoint, 8 held-out DBs, seed 42) from `train_spider.json`; dev is never touched.
@@ -85,7 +85,7 @@ Estimated ~1 h. **Actual: 8 min total** (smoke 2 min, full 6 min; generation 0.2
 ### Risks
 fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on long examples (reduce per-device batch to 2, grad-accum 8); Kaggle 12 h limit (far away; checkpoints anyway).
 
-## Phase 3 — Fine-tuned evaluation (plan approved)
+## Phase 3 — Fine-tuned evaluation ✅
 - [x] `notebooks/03_finetuned_eval/` generated: same `src/run_eval.py` as notebook 01; only change = `--adapter` (02 kernel output attached as `kernel_sources`, merged into the base with `merge_and_unload`). Same prompts, greedy, 256 tokens, batch 16.
 - [ ] Smoke run on 50 examples (checks adapter loading + output format), then the full dev set.
 - [ ] Download to `results/finetuned/` (predictions.csv, metrics.csv, run_info.json, log).
@@ -93,7 +93,7 @@ fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on l
 - Testing: compare.py unit-tested on CPU (base vs base must give delta 0). Expected GPU time ~10 min total (baseline took 6 min; merged LoRA has the same speed).
 - Risk: adapter path inside the kernel input differs → notebook globs for `adapter_config.json` outside `checkpoint-*`.
 
-## Phase 4 — Analysis (plan approved; CPU only)
+## Phase 4 — Analysis ✅ (CPU only)
 - [ ] `src/analysis.py` (run locally, outputs in `results/`):
   - `exec_acc_by_level.png` grouped bars base vs FT (overall + 4 levels, value labels, n per level);
   - `valid_sql_rate.png` (base vs FT, overall + per level); `exact_match_by_level.png`;

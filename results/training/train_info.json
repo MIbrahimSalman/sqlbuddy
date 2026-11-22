@@ -1,0 +1,45 @@
+{
+  "base_model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "targets": [
+      "down_proj",
+      "gate_proj",
+      "k_proj",
+      "o_proj",
+      "q_proj",
+      "up_proj",
+      "v_proj"
+    ]
+  },
+  "epochs": 2,
+  "max_steps": -1,
+  "steps_done": 820,
+  "lr": 0.0002,
+  "effective_batch": 16,
+  "max_length": 1536,
+  "n_train": 6560,
+  "n_val": 352,
+  "dropped_train": 88,
+  "dropped_val": 0,
+  "val_dbs": [
+    "body_builder",
+    "climbing",
+    "gas_company",
+    "local_govt_mdm",
+    "music_1",
+    "protein_institute",
+    "tracking_grants_for_research",
+    "workshop_paper"
+  ],
+  "trainable_params": 18464768,
+  "total_params": 1562179072,
+  "train_seconds": 7786,
+  "seconds_per_step": 9.49,
+  "final_train_loss": 0.08957765876519971,
+  "final_eval_loss": 0.222747802734375,
+  "peak_gpu_mem_gb": 5.43,
+  "gpu": "Tesla T4"
+}

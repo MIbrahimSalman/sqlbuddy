@@ -1,5 +1,40 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Phases 3 + 4 complete: fine-tuning beats the base model
+
+**Results (Spider dev, 1,034 held-out questions)**
+| | EX | EM | valid SQL |
+|---|---|---|---|
+| base | 56.96 | 32.40 | 76.60 |
+| fine-tuned | **73.11** | **67.99** | **91.78** |
+- EX +16.15 pp (95 % paired bootstrap CI 13.2–19.1); 220 fixes vs 53 regressions; exact McNemar p = 2.4e-25; significant at every level (extra: +9.6 pp, p = 0.014; hard: +24.1 pp).
+
+**Done**
+- 03 smoke (50) then full run; outputs in `results/finetuned/`. `src.compare` → `comparison.csv`, `flips.csv`, `statistics.json`.
+- `src.analysis` → 3 bar charts + loss curve, `error_types.csv`; fixed sample rounding (49 → exactly 50 rows).
+- Manual labels for 50 FT failures in `error_sample.csv`; `results/error_analysis.md` (fixes, 5+5 examples, regressions, limitations).
+- Key insights: alias errors (`no such column: T2.x`) 201 → 61; FT copies Spider style (0 % INNER JOIN, 0.54 joins/query ≈ gold 0.50) → EM gain (+35.6) partly style; remaining bottleneck = schema linking (27/50) + cell values never seen (5/50); 2/50 gold/eval artifacts; EX false positive example test_197.
+
+**Next steps**
+1. Phase 5: demo test with the HF adapter (CPU, base + fine-tuned, Compare mode); optional 04 GPU notebook check.
+2. Phase 6: README (mermaid, results, charts, limitations, reproduction, demo commands), `PRESENTATION_NOTES.md`.
+
+## 2026-11-22 — Phase 2 complete: LoRA adapter trained and uploaded
+
+**Done**
+- Full run (kernel v4): 2 epochs = 820 steps, 2 h 10 min on a T4 (9.49 s/step, 5.43 GB peak). 18.5 M trainable params (1.18 % of 1.56 B).
+- Train loss 0.255 → 0.036. Validation loss (352 examples, 8 unseen DBs): 0.190 (step 100) → **min 0.184 at step 200** → 0.196 at end of epoch 1 → 0.223 final.
+- Logs in `results/training/` (loss_history.csv, loss_curve.png, train_info.json). Adapter uploaded privately to HF `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora` (not in git).
+- CPU check on `university.db`: fine-tuned model fixes the base model's wrong-alias error on "average score per course" (`T2.title` → `T1.title`).
+
+**Observation (for the report)**
+- Validation *loss* rises in epoch 2 while train loss keeps falling: the model becomes over-confident on token level (overfitting in loss terms). We keep the pre-registered choice (final adapter after 2 epochs) and judge it by execution accuracy on the test set, not by loss; only the last 2 checkpoints were kept, so the step-200 checkpoint is not available. Listed as a limitation / future work (early stopping on validation EX).
+
+**Next steps**
+1. `03_finetuned_eval` smoke (v1, 50 questions) → full run → `results/finetuned/`.
+2. `src.compare`, `src.analysis`, manual error review → `results/error_analysis.md`.
+3. Demo test with the HF adapter, Phase 6 docs.
+
 ## 2026-11-22 — While training runs: Phase 3/4/5 code prepared
 
 **Done**
