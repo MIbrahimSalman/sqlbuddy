@@ -20,6 +20,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from sqlbuddy_core import ADAPTER, SAMPLE_DB, Models, UnsafeQuery, run_select, schema_of  # noqa: E402
 
 MODELS = Models()
+# Keep the generated-SQL boxes compact (Gradio 6 takes css in launch()).
+CSS = ".sqlbox .cm-editor, .sqlbox .codemirror-wrapper, .sqlbox .wrap { min-height: 0 !important; max-height: 180px; }"
+NO_RESULT = pd.DataFrame({"(no result)": []})  # empty table with a readable header
 EXAMPLES = [
     "How many students are there?",
     "List the names of students from Lahore.",
@@ -49,27 +52,27 @@ def answer_one(db: str, question: str, fine_tuned: bool):
     try:
         sql, _raw, secs = MODELS.generate(schema_of(db), question, fine_tuned)
     except Exception as e:
-        return "", pd.DataFrame(), f"**{label}:** generation failed - {e}"
+        return "", NO_RESULT, f"**{label}:** generation failed - {e}"
     try:
         cols, rows, truncated = run_select(db, sql)
-        df = pd.DataFrame(rows, columns=cols)
+        df = pd.DataFrame(rows, columns=cols).round(2)  # 2 decimals: averages are easier to read
         note = f" (first {len(rows)} rows shown)" if truncated else ""
         return sql, df, f"**{label}:** {len(rows)} row(s){note} · generated in {secs:.1f} s"
     except UnsafeQuery as e:
-        return sql, pd.DataFrame(), f"**{label}:** blocked - {e}"
+        return sql, NO_RESULT, f"**{label}:** blocked - {e}"
     except Exception as e:
-        return sql, pd.DataFrame(), f"**{label}:** the SQL failed to run - `{e}`"
+        return sql, NO_RESULT, f"**{label}:** the SQL failed to run - `{e}`"
 
 
 def ask(choice, upload, question, mode):
     if not question.strip():
-        empty = ("", pd.DataFrame(), "Type a question first.")
-        return (*empty, "", pd.DataFrame(), "")
+        empty = ("", NO_RESULT, "Type a question first.")
+        return (*empty, "", NO_RESULT, "")
     db = pick_db(choice, upload)
     if mode == "Compare both":
         return (*answer_one(db, question, False), *answer_one(db, question, True))
     first = answer_one(db, question, mode == "Fine-tuned")
-    return (*first, "", pd.DataFrame(), "")
+    return (*first, "", NO_RESULT, "")
 
 
 def build_ui() -> gr.Blocks:
@@ -91,13 +94,13 @@ def build_ui() -> gr.Blocks:
                 mode = gr.Radio(["Fine-tuned", "Base", "Compare both"], value="Fine-tuned", label="Model")
                 go = gr.Button("Generate SQL and run", variant="primary")
                 gr.Examples(EXAMPLES, inputs=question)
-                sql1 = gr.Code(language="sql", label="Generated SQL")
+                sql1 = gr.Code(language="sql", label="Generated SQL (first model)", wrap_lines=True, lines=3, max_lines=8, elem_classes="sqlbox")
                 status1 = gr.Markdown()
-                table1 = gr.Dataframe(label="Result", interactive=False)
+                table1 = gr.Dataframe(value=NO_RESULT, label="Result", interactive=False)
                 with gr.Accordion("Second model (Compare both)", open=False):
-                    sql2 = gr.Code(language="sql", label="Generated SQL (fine-tuned)")
+                    sql2 = gr.Code(language="sql", label="Generated SQL (fine-tuned)", wrap_lines=True, lines=3, max_lines=8, elem_classes="sqlbox")
                     status2 = gr.Markdown()
-                    table2 = gr.Dataframe(label="Result (fine-tuned)", interactive=False)
+                    table2 = gr.Dataframe(value=NO_RESULT, label="Result (fine-tuned)", interactive=False)
 
         db_choice.change(show_schema, [db_choice, upload], schema)
         upload.change(lambda u: ("Upload my own", show_schema("Upload my own", u)), upload, [db_choice, schema])
@@ -113,4 +116,4 @@ if __name__ == "__main__":
     ap.add_argument("--share", action="store_true", help="create a public gradio.live link")
     ap.add_argument("--port", type=int, default=7860)
     a = ap.parse_args()
-    build_ui().launch(share=a.share, server_port=a.port)
+    build_ui().launch(share=a.share, server_port=a.port, css=CSS)

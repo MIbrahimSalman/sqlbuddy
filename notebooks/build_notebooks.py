@@ -183,7 +183,8 @@ display(pred[["question", "gold_sql", "pred_sql", "hardness", "exec_match", "exa
     ]
 
 
-def nb04():
+def nb04(smoke: bool):
+    minutes = 1 if smoke else 90
     return [
         md("""
 # SQLBuddy 04 - Live demo on GPU (backup for the presentation)
@@ -210,10 +211,22 @@ sqlbuddy_app.MODELS.load()                 # load base + adapter on the GPU now,
 print("adapter loaded:", sqlbuddy_app.MODELS.has_adapter, sqlbuddy_app.MODELS.adapter_error or "")
 """),
         code("""
+# Self-test: one example question through both models (same code path as the UI button)
+q = "What is the average score in each course? Show the course title."
+db = str(sqlbuddy_app.SAMPLE_DB)
+for ft in (False, True):
+    sql, df, status = sqlbuddy_app.answer_one(db, q, ft)
+    print(status)
+    print("  ", sql)
+    print(df.head(3))
+    print()
+"""),
+        code(f"""
 import time
-DEMO_MINUTES = 90
+DEMO_MINUTES = {minutes}
 demo = sqlbuddy_app.build_ui()
-demo.launch(share=True, prevent_thread_lock=True)   # prints the public *.gradio.live URL
+demo.launch(share=True, prevent_thread_lock=True, css=sqlbuddy_app.CSS)
+print("PUBLIC LINK:", demo.share_url)      # open this *.gradio.live URL in any browser
 time.sleep(DEMO_MINUTES * 60)
 demo.close()
 """),
@@ -228,4 +241,4 @@ if __name__ == "__main__":
     write("02_train_lora", "Train LoRA", nb02("02" in a.smoke), [SPIDER_DATASET, SRC_DATASET])
     write("03_finetuned_eval", "Fine-tuned eval", nb03("03" in a.smoke), [SPIDER_DATASET, SRC_DATASET],
           kernels=[f"{USER}/sqlbuddy-02-train-lora"])
-    write("04_demo", "Demo", nb04(), [SPIDER_DATASET, SRC_DATASET], kernels=[f"{USER}/sqlbuddy-02-train-lora"])
+    write("04_demo", "Demo", nb04("04" in a.smoke), [SPIDER_DATASET, SRC_DATASET], kernels=[f"{USER}/sqlbuddy-02-train-lora"])
