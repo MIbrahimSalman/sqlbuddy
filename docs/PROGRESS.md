@@ -1,5 +1,22 @@
 # Progress log (newest first)
 
+## 2026-11-22 — While training runs: Phase 3/4/5 code prepared
+
+**Done**
+- User approved the Phase 3/4/5 plans (run back-to-back); adapter repo stays private (demo uses an HF read token).
+- `src/compare.py` (comparison.csv, flips.csv, statistics.json with exact McNemar + paired bootstrap CI) + tests.
+- `src/analysis.py` (grouped-bar charts with the validated blue/orange palette, loss curve, automatic error-category pre-labels via sqlglot, stratified 50-failure sample for manual review). Tested on base-vs-base.
+- Demo: `sample_db/make_university_db.py` → `university.db` (5 tables, 169 rows); `app/sqlbuddy_core.py` (one copy of base weights, LoRA switched on/off; SELECT-only check + read-only connection + SQLite authorizer + timeout + 200-row cap); `app/app.py` (Gradio: DB choice/upload, schema, Base / Fine-tuned / Compare). CPU test: base answers in ~4 s. 15 safety tests.
+- `notebooks/04_demo` (GPU + share link, adapter from the 02 kernel output). `requirements.txt` re-pinned to the verified versions.
+- 41 tests pass. Kaggle `sqlbuddy-src` now also ships `app/` + sample DB (layout `src/`, `app/`, `sample_db/`).
+
+**Next steps**
+1. When `02_train_lora` v4 completes: download → `results/training/` (loss_history.csv, loss_curve.png, train_info.json); adapter to scratchpad (not git).
+2. CPU-check the adapter, upload to HF (`scripts/upload_adapter.py`).
+3. Push `03_finetuned_eval` smoke (50) → full; then `python -m src.compare results/baseline results/finetuned results` and `python -m src.analysis results/baseline results/finetuned results/training results`.
+4. Manual review of `results/error_sample.csv` → `results/error_analysis.md`.
+5. Test the demo with the real adapter (CPU), Phase 6 docs.
+
 ## 2026-11-22 — Phase 2 in progress: full LoRA training running on Kaggle
 
 **Done**
