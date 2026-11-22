@@ -1,5 +1,21 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Phase 8: demo hosting on Kaggle (from GitHub main), public adapter, deploy.sh
+
+**Done**
+- Adapter repo on Hugging Face made **public** (user OK). Laptops and Kaggle load it with no login; the app's wording is updated.
+- **Hugging Face Space attempted and dropped.** Creating it returned 402: Gradio Spaces on free CPU now need PRO. User chose "Kaggle only, free". The Space files were removed.
+- **Notebook 04 now downloads the app from GitHub main at the start of every run** (prints the commit). The adapter comes from the public HF repo and the notebook has no Kaggle inputs. Editor "Run all" = 90 min demo; CLI push = self-test + 1 min.
+- **`scripts/deploy.sh`** (one command after app changes): tests → commit must be in GitHub main → refresh `sqlbuddy-src` → Kaggle test run of notebook 04 → prints the commit Kaggle ran and checks that the adapter loaded and the fine-tuned answer succeeded. It refuses with uncommitted or unmerged work, or while notebook 04 is running.
+- Fixed a deploy.sh bug found in testing: right after a push, `kaggle kernels status` can still report the previous run → the script now polls `<kernel>/<version>` and explains cancelled runs.
+- **End-to-end test (run 14): OK.** Kaggle ran GitHub main `bc0cbd5` on a Tesla T4 (fp16) with the adapter loaded; run type Batch → 1 min; public link created.
+- Docs: README §7 (Kaggle demo steps, deploy.sh, no HF login), GUIDE, PLAN (Phase 8), DECISIONS, KAGGLE_RUNS (runs 11–14), CLAUDE.md.
+
+**Next steps**
+- Presentation day: Kaggle → `sqlbuddy-04-demo` → Edit → GPU T4 + Internet on → Run all → share the `PUBLIC LINK` (90 min).
+- After any app change: merge into main, then `bash scripts/deploy.sh`.
+- Still open from Phase 7: fill in the deck's cover placeholders and share the deck.
+
 ## 2026-11-22 — Group guide
 
 **Done**
