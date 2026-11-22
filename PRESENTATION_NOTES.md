@@ -4,8 +4,8 @@
 it can be downloaded as PowerPoint or PDF). Speaker notes are attached to every slide.
 
 Before presenting:
-- Fill in the placeholders on the cover: `[Group members]`, `[Course name]`, `[Date]`.
-- Start the demo app a few minutes early (`python app/app.py`) and wait for **Model ready**.
+- The cover lists Fatima Malik (23L-0826), Mohammad Ibrahim Salman (23L-0723) and CS4063 – Natural Language Processing (no date, as requested).
+- About 5 minutes before presenting, start the Kaggle demo: kaggle.com → `sqlbuddy-04-demo` → Edit → GPU T4 + Internet on → Run all, then open the printed `PUBLIC LINK` (it stays up 90 min). Backup: `python app/app.py` on a laptop.
 
 Every number below comes from `results/`.
 
@@ -23,7 +23,7 @@ Every number below comes from `results/`.
 | 10 | Per database | 18 of 20 DBs improve; largest +43.3 (course_teach), only drop −2.3 (pets_1) | `exec_acc_by_database.png` |
 | 11 | Out-of-domain | Own university.db, 30 questions: 36.7 → 73.3, 11 fixed / 0 broken, p = 0.001 | big numbers + table |
 | 12 | Error analysis | Alias errors 201 → 61; EM rises more than EX because of style; 27/50 remaining failures are schema linking | code examples + table |
-| 13 | Demo | Live Compare mode; read-only safety; ~0.16 s per token on CPU | `demo_screenshot.png` |
+| 13 | Demo | Live Compare mode on a free Kaggle T4 GPU (~1–4 s per question, public link, always the latest app from GitHub); read-only safety; laptop CPU fallback 3–15 s | `demo_screenshot.png` |
 | 14 | Limitations | One DB instance, contamination, epoch-2 over-fitting, schema only, single run, CPU speed | 6 cards |
 | 15 | Conclusion | +16.2 points, 18/20 DBs, 1.2 % of weights; remaining challenge = schema understanding | 3 numbers |
 
