@@ -150,6 +150,33 @@ before testing, the **final** adapter is the one evaluated.
 
 Both full evaluations took about 4 minutes of generation on a T4 (batched, 16 prompts at a time).
 
+### Is the gain broad? Per database
+
+18 of the 20 unseen dev databases improve, `real_estate_properties` (4 questions) is unchanged, and `pets_1`
+drops by 2.3 points (`results/per_database.csv`). The gain is therefore not carried by one or two easy
+databases.
+
+![Execution accuracy per database](results/exec_acc_by_database.png)
+
+### Does it carry over to a new database? Out-of-domain test
+
+We wrote 30 questions with gold SQL for our own `sample_db/university.db` and fixed them **before** running
+either model (`sample_db/university_test.json`, `python -m src.ood_eval`, results in `results/ood/`). The
+evaluation used the same prompt, the same decoding and the same execution-accuracy rules, and the official
+hardness levels (easy 10, medium 7, hard 7, extra hard 6).
+
+| | base | fine-tuned |
+|---|---|---|
+| execution accuracy | 36.7 % | **73.3 %** |
+| valid SQL | 50.0 % | 80.0 % |
+| fixed / broken | | 11 / 0 |
+
+- Exact McNemar test: p = 0.001. 95 % bootstrap CI of the gain: [+20, +53] pp.
+- The fine-tuned model keeps its Spider-level accuracy (73.3 vs 73.1). The base model drops (36.7 vs 57.0),
+  mainly through the wrong-alias errors described below.
+- With 30 questions the interval is wide, so this is supporting evidence, not a main result.
+- The questions were written by us, so their style may be closer to Spider than a real user's.
+
 ## 5. Error analysis (summary)
 
 The full write-up is [`results/error_analysis.md`](results/error_analysis.md). The 50 hand-labelled
