@@ -243,6 +243,15 @@ hf auth login
 python app/app.py
 ```
 
+**If `hf auth login` does not work** (e.g. "hf is not recognized" / "command not found"):
+- Make sure the virtual environment is active: the prompt starts with `(.venv)`. On Windows, if
+  `Activate.ps1` is blocked, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, or use
+  `cmd` with `.venv\Scripts\activate.bat`.
+- Call the login through Python instead (same tool, no PATH needed):
+  `python -m huggingface_hub.cli.hf auth login`
+- Or skip the login and pass the token for this terminal session only:
+  PowerShell `$env:HF_TOKEN="hf_..."`, macOS `export HF_TOKEN=hf_...`, then `python app/app.py`.
+
 ### Using the app
 1. Open http://127.0.0.1:7860.
 2. Click an example question, choose **Compare both** and press **Generate SQL and run**.
