@@ -53,7 +53,7 @@ Estimated ~1 h. **Actual: 8 min total** (smoke 2 min, full 6 min; generation 0.2
 
 ---
 
-## Phase 2 — LoRA fine-tuning (plan approved; max_length 1536)
+## Phase 2 — LoRA fine-tuning ✅ (max_length 1536)
 
 ### Data
 - Train 6,648 / validation 352 (DB-disjoint, 8 held-out DBs, seed 42) from `train_spider.json`; dev is never touched.

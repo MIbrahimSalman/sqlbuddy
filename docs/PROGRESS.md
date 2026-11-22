@@ -1,5 +1,21 @@
 # Progress log (newest first)
 
+## 2026-11-22 — Phase 2 complete: LoRA adapter trained and uploaded
+
+**Done**
+- Full run (kernel v4): 2 epochs = 820 steps, 2 h 10 min on a T4 (9.49 s/step, 5.43 GB peak). 18.5 M trainable params (1.18 % of 1.56 B).
+- Train loss 0.255 → 0.036. Validation loss (352 examples, 8 unseen DBs): 0.190 (step 100) → **min 0.184 at step 200** → 0.196 at end of epoch 1 → 0.223 final.
+- Logs in `results/training/` (loss_history.csv, loss_curve.png, train_info.json). Adapter uploaded privately to HF `ibrahimsalman022/sqlbuddy-qwen2.5-coder-1.5b-lora` (not in git).
+- CPU check on `university.db`: fine-tuned model fixes the base model's wrong-alias error on "average score per course" (`T2.title` → `T1.title`).
+
+**Observation (for the report)**
+- Validation *loss* rises in epoch 2 while train loss keeps falling: the model becomes over-confident on token level (overfitting in loss terms). We keep the pre-registered choice (final adapter after 2 epochs) and judge it by execution accuracy on the test set, not by loss; only the last 2 checkpoints were kept, so the step-200 checkpoint is not available. Listed as a limitation / future work (early stopping on validation EX).
+
+**Next steps**
+1. `03_finetuned_eval` smoke (v1, 50 questions) → full run → `results/finetuned/`.
+2. `src.compare`, `src.analysis`, manual error review → `results/error_analysis.md`.
+3. Demo test with the HF adapter, Phase 6 docs.
+
 ## 2026-11-22 — While training runs: Phase 3/4/5 code prepared
 
 **Done**
