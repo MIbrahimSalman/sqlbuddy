@@ -1,0 +1,37 @@
+[{"stream_name":"stderr","time":7.7994622,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":7.79952558,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":7.799529935,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":7.799532675,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":8.402106529,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":8.402153825,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":8.402165464,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":8.402168463,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":30.994910644,"data":"\u001b[31mERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\r\n"}
+,{"stream_name":"stdout","time":30.994937593,"data":"bigframes 2.51.0 requires google-cloud-bigquery-storage\u003c3.0.0,\u003e=2.30.0, which is not installed.\r\n"}
+,{"stream_name":"stdout","time":30.994963206,"data":"litellm 1.109.1 requires huggingface-hub\u003c2.0,\u003e=0.34.0, but you have huggingface-hub 2.4.0 which is incompatible.\r\n"}
+,{"stream_name":"stdout","time":30.994978804,"data":"cudf-cu13 26.6.0 requires pyarrow\u003c24,\u003e=19.0.0, but you have pyarrow 26.0.1 which is incompatible.\r\n"}
+,{"stream_name":"stdout","time":30.99498258,"data":"gradio 6.30.0 requires pillow\u003c13.0,\u003e=8.0, but you have pillow 13.0.0 which is incompatible.\u001b[0m\u001b[31m\r\n"}
+,{"stream_name":"stdout","time":31.342053872,"data":"\u001b[0mNote: you may need to restart the kernel to use updated packages.\n"}
+,{"stream_name":"stdout","time":42.495912637,"data":"src commit: c4f3325\n"}
+,{"stream_name":"stdout","time":42.495950838,"data":"Spider root: /kaggle/input/datasets/jeromeblanchet/yale-universitys-spider-10-nlp-dataset/spider\n"}
+,{"stream_name":"stdout","time":68.941166849,"data":"torch 2.11.0+cu130 | transformers 5.22.1 | peft 0.21.2 | datasets 5.1.0\n"}
+,{"stream_name":"stdout","time":68.94119963200001,"data":"GPU: Tesla T4\n"}
+,{"stream_name":"stderr","time":70.119636673,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":70.119663331,"data":"\n"}
+,{"stream_name":"stderr","time":70.119668783,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":71.662208585,"data":"1034 test examples, spider root = /kaggle/input/datasets/jeromeblanchet/yale-universitys-spider-10-nlp-dataset/spider\n"}
+,{"stream_name":"stdout","time":321.581023927,"data":"generation: 224s (0.22s/example)\n"}
+,{"stream_name":"stdout","time":347.669892465,"data":"{'level': 'easy', 'count': 248, 'exec_acc': 72.18, 'exact_match': 63.31, 'valid_sql': 89.11}\n"}
+,{"stream_name":"stdout","time":347.669924808,"data":"{'level': 'medium', 'count': 446, 'exec_acc': 59.19, 'exact_match': 27.13, 'valid_sql': 74.89}\n"}
+,{"stream_name":"stdout","time":347.669931031,"data":"{'level': 'hard', 'count': 174, 'exec_acc': 39.66, 'exact_match': 16.09, 'valid_sql': 70.69}\n"}
+,{"stream_name":"stdout","time":347.669935646,"data":"{'level': 'extra', 'count': 166, 'exec_acc': 46.39, 'exact_match': 17.47, 'valid_sql': 68.67}\n"}
+,{"stream_name":"stdout","time":347.669954299,"data":"{'level': 'all', 'count': 1034, 'exec_acc': 56.96, 'exact_match': 32.4, 'valid_sql': 76.6}\n"}
+,{"stream_name":"stderr","time":353.42454282,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":353.424575408,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":353.567493516,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":353.567517127,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":354.329825445,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":354.433467509,"data":"[NbConvertApp] Writing 232439 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":357.029268048,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":357.554411583,"data":"[NbConvertApp] Writing 461534 bytes to __results__.html\n"}
+]

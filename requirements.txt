@@ -1,0 +1,18 @@
+# Local / demo requirements (CPU). Same library versions as the Kaggle notebooks
+# (Kaggle uses its preinstalled torch 2.11; locally torch 2.14.1 CPU was tested).
+# CPU-only torch (smaller download):  pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1
+transformers==5.22.1
+peft==0.21.2
+accelerate==1.15.0
+huggingface_hub==2.4.0
+gradio==6.31.0
+pandas==3.1.0
+# evaluation / analysis (not needed for the demo)
+datasets==5.1.0
+nltk==3.9.2
+trl==1.17.1
+matplotlib==3.11.2
+scipy==1.18.1
+sqlglot==30.27.0
+pytest

@@ -1,0 +1,20 @@
+{
+  "id": "mibrahimsalman022/sqlbuddy-04-demo",
+  "title": "sqlbuddy-04-demo",
+  "code_file": "04_demo.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "jeromeblanchet/yale-universitys-spider-10-nlp-dataset",
+    "mibrahimsalman022/sqlbuddy-src"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "mibrahimsalman022/sqlbuddy-02-train-lora"
+  ],
+  "model_sources": []
+}
