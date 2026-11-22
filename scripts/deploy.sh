@@ -54,16 +54,25 @@ fi
 if kaggle kernels status "$KERNEL" 2>/dev/null | grep -q RUNNING; then
   fail "notebook 04 is running right now (maybe someone is presenting). Try again later, or use --no-kaggle-test."
 fi
-kaggle kernels push -p notebooks/04_demo --accelerator NvidiaTeslaT4 | tail -1
-echo "waiting for the Kaggle test run (about 4-6 minutes) ..."
+PUSH="$(kaggle kernels push -p notebooks/04_demo --accelerator NvidiaTeslaT4 | tail -1)"
+echo "$PUSH"
+VERSION="$(echo "$PUSH" | grep -oE 'version [0-9]+' | grep -oE '[0-9]+' || true)"
+[[ -n "$VERSION" ]] || fail "push failed: $PUSH"
+RUN="${KERNEL}/${VERSION}"     # always ask about THIS version (the plain name can report the previous run)
+echo "waiting for the Kaggle test run v${VERSION} (about 4-6 minutes) ..."
 sleep 30
-while kaggle kernels status "$KERNEL" 2>/dev/null | grep -qE "RUNNING|QUEUED"; do sleep 30; done
-STATUS="$(kaggle kernels status "$KERNEL" 2>&1)"
+while kaggle kernels status "$RUN" 2>/dev/null | grep -qE "RUNNING|QUEUED"; do sleep 30; done
+STATUS="$(kaggle kernels status "$RUN" 2>&1)"
+echo "$STATUS"
+if echo "$STATUS" | grep -q CANCEL; then
+  fail "Kaggle cancelled the test run v${VERSION} before it produced output.
+Usual cause: another Kaggle GPU session is still open on this account (e.g. notebook 04 started from the
+Kaggle editor). Stop it under kaggle.com -> 'View Active Events', then run this script again."
+fi
 OUT="$(mktemp -d)"
 trap 'rm -rf "$OUT"' EXIT
-kaggle kernels output "$KERNEL" -p "$OUT" -q >/dev/null 2>&1 || true
+kaggle kernels output "$RUN" -p "$OUT" -q >/dev/null 2>&1 || true
 LOG="$(ls "$OUT"/*.log 2>/dev/null | head -1 || true)"
-echo "$STATUS"
 [[ -n "$LOG" ]] || fail "no Kaggle log found - open https://www.kaggle.com/code/${KERNEL}"
 # print the lines that prove which app version ran and what the two models answered
 python - "$LOG" "${MAIN_SHA:0:7}" <<'PY'
