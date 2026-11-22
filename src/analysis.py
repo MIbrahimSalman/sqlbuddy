@@ -149,6 +149,48 @@ def error_tables(base: pd.DataFrame, ft: pd.DataFrame, out: Path, n_sample=50, s
     return types
 
 
+# ---------------------------------------------------------------------------------------------
+# Per-database breakdown: is the gain spread over all 20 unseen databases or driven by a few?
+# ---------------------------------------------------------------------------------------------
+def per_database(base: pd.DataFrame, ft: pd.DataFrame, out: Path) -> pd.DataFrame:
+    g = pd.DataFrame({"db_id": base.db_id, "base": base.exec_match, "ft": ft.set_index("id").loc[base.id].exec_match.values})
+    t = g.groupby("db_id").agg(n=("base", "size"), exec_acc_base=("base", "mean"), exec_acc_ft=("ft", "mean"))
+    t[["exec_acc_base", "exec_acc_ft"]] = (100 * t[["exec_acc_base", "exec_acc_ft"]]).round(1)
+    t["delta_pp"] = (t.exec_acc_ft - t.exec_acc_base).round(1)
+    t = t.sort_values("delta_pp").reset_index()
+    t.to_csv(out / "per_database.csv", index=False)
+    _dumbbell(t, out / "exec_acc_by_database.png")
+    return t
+
+
+def _dumbbell(t: pd.DataFrame, path: Path):
+    """One row per database: base (blue) -> fine-tuned (orange) execution accuracy."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(8, 0.32 * len(t) + 1.2))
+    y = range(len(t))
+    for i, r in t.iterrows():
+        ax.plot([r.exec_acc_base, r.exec_acc_ft], [i, i], color=GRID, linewidth=2.5, zorder=1)
+    ax.scatter(t.exec_acc_base, y, s=46, color=C_BASE, label="Base model", zorder=2, edgecolor="white", linewidth=1)
+    ax.scatter(t.exec_acc_ft, y, s=46, color=C_FT, label="Fine-tuned (LoRA)", zorder=3, edgecolor="white", linewidth=1)
+    ax.set_yticks(list(y), [f"{d} (n={n})" for d, n in zip(t.db_id, t.n)], fontsize=8.5, color=INK2)
+    ax.set_xlim(0, 102)
+    ax.set_xlabel("execution accuracy (%)", color=INK2)
+    ax.set_title("Execution accuracy per unseen Spider dev database", color=INK, loc="left", fontsize=12)
+    ax.xaxis.grid(True, color=GRID, linewidth=0.8)
+    ax.set_axisbelow(True)
+    for s in ("top", "right", "left"):
+        ax.spines[s].set_visible(False)
+    ax.spines["bottom"].set_color(GRID)
+    ax.tick_params(colors=INK2, length=0)
+    ax.legend(frameon=False, loc="lower right", fontsize=9)
+    fig.tight_layout()
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
 def main(base_dir, ft_dir, train_dir, out_dir):
     out = Path(out_dir)
     base = pd.read_csv(Path(base_dir) / "predictions.csv", keep_default_na=False)
@@ -160,6 +202,7 @@ def main(base_dir, ft_dir, train_dir, out_dir):
         plot_loss(pd.read_csv(hist).astype(object).where(lambda d: d.notna(), None).to_dict("records"),
                   out / "loss_curve.png")
     print(error_tables(base, ft, out).to_string())
+    print(per_database(base, ft, out).to_string(index=False))
 
 
 if __name__ == "__main__":

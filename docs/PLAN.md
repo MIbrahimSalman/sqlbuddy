@@ -115,3 +115,11 @@ fp16 overflow/NaN (fp32 LoRA weights, grad clipping, AMP loss scaling); OOM on l
 - [x] README.md: problem, why text-to-SQL, dataset, method + mermaid pipeline, training setup, results table + charts, error analysis summary, limitations, reproduction (Kaggle steps), demo on Windows/Mac.
 - [x] `PRESENTATION_NOTES.md`: 10-slide outline with key numbers/charts.
 - [x] Final summary to user: results table, file list, laptop demo commands.
+
+## Phase 7 — Demo polish, latency, extra evaluation, slide deck (self-approved, user request 2026-11-22)
+- [x] UI redesign: three steps (database → question → results), upload validation, schema preview, examples, Fine-tuned default, side-by-side Compare panels, explicit states (loading / queued / generating / running SQL / done / error / cancelled), device + mode + measured time, Stop, no duplicate submissions, plain-language SQL errors, read-only protections unchanged. Responsive at phone width.
+- [x] Latency investigation (`docs/PERFORMANCE.md`): profile load / prefill / decode; output-preserving speed-ups only (background load + warm-up, prompt-prefix KV cache, streaming, MPS on Macs).
+- [x] UI tests (`tests/test_app_ui.py`); notebook 04 re-verified on a T4.
+- [x] Per-database breakdown of the dev results (`results/per_database.csv`, `exec_acc_by_database.png`).
+- [x] Out-of-domain test: 30 hand-written questions on `university.db`, gold SQL fixed before running the models (`sample_db/university_test.json`, `src/ood_eval.py`, `results/ood/`).
+- [x] Slide deck (claude.ai Slides artifact, exportable to PowerPoint/PDF) + updated PRESENTATION_NOTES / README.

@@ -48,3 +48,11 @@ Format: decision — reason — alternatives considered. User answers are marked
 
 ## User instruction (2026-11-22)
 - **(user) "Approve the tasks yourself and push and merge things to the GitHub repo by yourself."** From now on phase plans are self-approved (still documented in PLAN.md / DECISIONS.md), and finished work is merged into the default branch without asking.
+
+## Phase 7 (2026-11-22, self-approved per the user's instruction)
+- **Demo speed: only output-preserving optimisations.** Prompt-prefix KV cache (system prompt + schema cached per DB and per mode, deep-copied per question; verified identical tokens 8/8), background load + warm-up, streaming. Rejected: int8 quantisation and a smaller model (would change the evaluated model), prompt-lookup decoding (identical output but ~50 % slower on CPU), bf16 by default (only fast on CPUs with native bf16; opt-in `SQLBUDDY_DTYPE=bf16`).
+- **CPU stays fp32 by default; GPU fp16 (CUDA or Apple MPS) chosen automatically.** Override with `SQLBUDDY_DEVICE` / `SQLBUDDY_DTYPE`.
+- **Cancellation via a per-session stop flag checked between tokens** (a `StoppingCriteria`), not by killing the Gradio task, so the model lock is always released and the partial SQL is kept.
+- **One generation at a time** (shared weights): a lock; other requests show "Queued". Compare mode = two sequential generations (base, then fine-tuned), stated in the UI.
+- **Out-of-domain test set written before running either model**, on our own DB, scored with the same EX rules and official hardness. It is small (30), so it is reported as supporting evidence with an exact McNemar test, not as a main result.
+- **Slide deck as a claude.ai Slides artifact** (download as .pptx / PDF) using the chart palette (base = blue, fine-tuned = orange); group names / course / date left as placeholders.
