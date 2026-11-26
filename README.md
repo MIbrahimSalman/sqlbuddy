@@ -190,7 +190,9 @@ failures are in `results/error_sample.csv`.
 - **The model learns Spider's SQL *style*.**
   - It stops using `INNER JOIN` (40 % of base queries, 0 % after).
   - It writes as many JOINs as the gold queries (0.54 vs. 0.50 per query, base 0.65).
-  - Its output is always a bare query (the base model added text or fences 13 % of the time).
+  - Both models return a bare query: neither added explanations or code fences on this test set. The
+    base model's raw output differed from the extracted SQL only in line breaks or a trailing `;` (13 %), so
+    the SQL-extraction step changed no score (checked: execution accuracy is identical with and without it).
   - That is why **EM (+35.6 pp) rises much more than EX (+16.2 pp)**: part of the EM gain is learned annotation style.
 - **Remaining bottleneck: schema linking.**
   - In the 50 reviewed failures, 27 pick the wrong table, join key or column, or misplace an alias.
