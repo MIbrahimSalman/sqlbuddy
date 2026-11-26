@@ -1,5 +1,22 @@
 # Progress log (newest first)
 
+## 2026-11-26 — Presentation script lengthened to 14–15 minutes
+
+**Done**
+- At the user's request, expanded the spoken script in `PRESENTATION_NOTES.md` from ~1,700 to ~2,260 words (about 14–15 min at ~155 wpm). Added:
+  - an agenda on the cover;
+  - why text-to-SQL is hard;
+  - the real Spider example walked through on the dataset slide;
+  - one question followed through the pipeline (verified: both models write `SELECT count(*) FROM singer` → 6);
+  - a concrete execution-accuracy vs exact-match example;
+  - the loss curve explained line by line;
+  - a schema-linking failure example (test_115, the USA car models);
+  - a closing message.
+- Per-slide timings updated, with tips for running long or short. Docs-only change.
+
+**Next steps**
+- Rehearse once with a timer. Optional: the few-shot/RAG baseline for the TA's baseline question.
+
 ## 2026-11-26 — Presentation script for the 10-slide deck
 
 **Done**

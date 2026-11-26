@@ -3,7 +3,12 @@
 **Deck:** https://claude.ai/artifact/GVSZ3uR7kogY9rAMugzxJH (export: Share → Export → PDF/PowerPoint).
 **Team:** Fatima Malik (23L-0826), Mohammad Ibrahim Salman (23L-0723). **Course:** CS4063 Natural Language Processing.
 
-**Total time:** about 10 minutes of talking, plus the live demo and questions.
+**Total time:** about **14–15 minutes** of talking (about 2,250 spoken words at a normal pace of ~155 words per
+minute), plus 1–2 minutes of live demo after slide 8, then questions.
+- **Running long?** Skip the "Following one question through" paragraph on slide 5 and the car-models example on
+  slide 9. That saves about 1 minute.
+- **Running short?** On slide 4, also explain the record's fields (db_id, question, query, tables.json, the
+  .sqlite file) from the "Show one record" box below its script. That adds about 30 seconds.
 
 **Suggested split:**
 - Fatima: slides 1–5 (problem, tools, dataset, pipeline).
@@ -19,33 +24,42 @@ Every number below comes from `results/`. If a TA asks "where is that number fro
 
 ---
 
-## Slide 1: Cover ("SQLBuddy", ~20 s)
+## Slide 1: Cover ("SQLBuddy", ~30 s)
 
 **On the slide:** the title, "Fine-tuning a small language model to turn English questions into SQL", and the team.
 
 **What to say:**
-> "Assalam-o-Alaikum. We are Fatima Malik and Mohammad Ibrahim Salman, and our project is SQLBuddy. SQLBuddy
-> lets someone ask a database a question in plain English, and a small language model that we fine-tuned
-> writes the SQL query to answer it. In the next ten minutes we'll show what we built, how we trained it, and
-> how we proved on unseen data that the fine-tuning really helps."
+> "Assalam-o-Alaikum. We are Fatima Malik and Mohammad Ibrahim Salman, and our project is **SQLBuddy**.
+>
+> SQLBuddy lets someone ask a database a question in plain English, and a small language model that we
+> fine-tuned writes the SQL query that answers it.
+>
+> We'll cover the problem, our tools, dataset and pipeline, how we fine-tuned and evaluated the model, the
+> results with a live demo, and finally what we learned and what comes next."
 
 **Likely question:** *"What does SQLBuddy actually do, in one line?"*
 → "You type a question; the model writes SQL; the app runs it read-only and shows the answer table."
 
 ---
 
-## Slide 2: Project overview ("From an English question to a working SQL query", ~60 s)
+## Slide 2: Project overview ("From an English question to a working SQL query", ~95 s)
 
 **On the slide:** three cards (Problem, Objectives, Proposed solution) and a real example: the question "Which
 teacher teaches the most courses?" → the SQL our fine-tuned model wrote.
 
 **What to say:**
-> "**The problem:** a lot of useful data sits in databases, but to get it out you have to write SQL, and most
-> people can't. Big models like GPT can translate questions to SQL, but every query costs money, and you have
-> to send your database structure to a third party.
+> "**The problem:** a lot of useful data sits in databases, but to
+> get it out you have to write SQL, and most people can't. Big models like GPT can translate questions to SQL,
+> but every query costs money, and you have to send your database structure to a third party.
 >
 > In NLP terms this task is called **text-to-SQL**, a kind of **semantic parsing**: we map a natural-language
 > question plus a database schema to a formal query that can be executed.
+>
+> It is harder than it looks, for three reasons:
+> 1. The model has to understand the question.
+> 2. It has to **link the words to the right tables and columns**. When someone says 'teacher', which table and
+>    which column is that?
+> 3. It has to work on **databases it has never seen before**, and still produce SQL that actually runs.
 >
 > **Our objectives** were three: fine-tune a *small open* model that can run on a laptop; prove with a held-out
 > test set that fine-tuning beats the same model without fine-tuning; and build a working demo.
@@ -67,27 +81,30 @@ teacher teaches the most courses?" → the SQL our fine-tuned model wrote.
 
 ---
 
-## Slide 3: Tools and technologies ("Open-source tools on one free GPU", ~45 s)
+## Slide 3: Tools and technologies ("Open-source tools on one free GPU", ~75 s)
 
 **On the slide:** three columns of tools, and a row of NLP techniques.
 
 **What to say:**
-> "Everything is open source and runs on a free GPU.
+> "Everything is open source and runs on a free GPU. The tools fall into three groups.
 >
 > **Model and training:**
-> - The base model is **Qwen2.5-Coder 1.5B Instruct**, a pretrained model for code.
+> - The base model is **Qwen2.5-Coder 1.5B Instruct**, a pretrained model for code. It already knows SQL
+>   syntax, which is why we chose it.
 > - **Hugging Face Transformers** loads it and generates the SQL, with PyTorch underneath.
 > - **PEFT** adds the LoRA adapter, and **TRL** runs the supervised fine-tuning.
 >
-> **Data and evaluation:** the data is **Spider**, **SQLite** executes every predicted query, and the
-> **official Spider evaluation script** gives the exact-match metric. We use SciPy for the significance test.
+> **Data and evaluation:** the data is **Spider**. **SQLite** executes every query the model writes, so we can
+> check the answer rather than just the text. The **official Spider evaluation script** gives the exact-match
+> metric and the difficulty levels. We use SciPy for the
+> significance test.
 >
 > **Compute and demo:**
 > - Training and evaluation ran on a free **Kaggle T4 GPU**.
-> - The trained adapter is published on **Hugging Face Hub**.
+> - The trained adapter is published on **Hugging Face Hub**, where anyone can download it.
 > - The web demo is built with **Gradio**.
 >
-> **The NLP techniques we used:**
+> **The NLP techniques we used**, on the bottom row:
 > - semantic parsing;
 > - transfer learning from a pretrained model;
 > - prompt engineering, where we write the database schema as text;
@@ -105,7 +122,7 @@ teacher teaches the most courses?" → the SQL our fine-tuned model wrote.
 
 ---
 
-## Slide 4: Dataset ("Spider dataset, split by database", ~70 s)
+## Slide 4: Dataset ("Spider dataset, split by database", ~2 min 15 s)
 
 **On the slide:** the split table (train 6,560 / validation 352 / test 1,034 / extra test 30) and four
 preparation steps.
@@ -113,10 +130,18 @@ preparation steps.
 **What to say:**
 > "We use **Spider**, the standard cross-domain text-to-SQL benchmark from Yale. It has about 10,000 questions
 > written by students over **200 databases in 138 domains** (concerts, cars, flights, pets, world geography and
-> so on). Every example is an English question, the correct SQL query, and the database it belongs to. The
-> databases are real SQLite files, so we can actually run the queries.
+> so on). 'Cross-domain' means the model can't memorise one database; it has to learn to read *any* schema.
 >
-> **Our split:**
+> Every example is an English question, the correct SQL query, and the database it belongs to. The databases
+> are real SQLite files with data, so we can actually run the queries.
+>
+> **Let me show one real example.** The question is: *'What are the distinct creation years of the departments
+> managed by a secretary born in state Alabama?'* It belongs to a database with three tables: department, head
+> and management. Management links the other two with foreign keys. The correct SQL joins all three tables and
+> filters on the state Alabama. Run on the real database, it returns one answer: **1903**. So even a short
+> question can need a three-table join, and that is what makes Spider hard.
+>
+> **Our split, in the table:**
 > - We **train** on Spider's training set: 132 databases, 6,560 questions after preparation.
 > - We **test** on Spider's dev set: **1,034 questions on 20 databases that never appear in training**. We
 >   checked: zero databases are shared.
@@ -132,7 +157,8 @@ preparation steps.
 > 4. We **drop the 88 longest examples**, over 1,536 tokens, instead of cutting them, because cutting would
 >    remove the SQL answer.
 >
-> The test set has four official difficulty levels: easy 248, medium 446, hard 174, extra hard 166."
+> The test set has four official difficulty levels, based on how complex the correct SQL is: easy 248,
+> medium 446, hard 174 and extra hard 166."
 
 **Show one record if asked ("show me the dataset"):**
 - **Question:** *"What are the distinct creation years of the departments managed by a secretary born in state 'Alabama'?"*
@@ -171,7 +197,7 @@ preparation steps.
 
 ---
 
-## Slide 5: Methodology and implementation ("System pipeline", ~60 s)
+## Slide 5: Methodology and implementation ("System pipeline", ~100 s)
 
 **On the slide:** the pipeline diagram (question + schema → prompt → two branches, baseline and baseline + LoRA
 → extract SQL, run on SQLite → score) and four numbered steps.
@@ -180,16 +206,24 @@ preparation steps.
 > "Here is the whole system, left to right.
 >
 > **Step 1:** we read the database structure and write it as CREATE TABLE text with keys, and add the question.
-> This prompt is **identical for both models**.
+> In front of it there is a short instruction: 'You are an expert SQLite assistant; return only the SQL
+> query.' This prompt is **identical for both models**.
 >
 > **Step 2:** the pipeline splits. The top branch is the **baseline**, Qwen2.5-Coder 1.5B exactly as
 > downloaded. The bottom branch is the **same model with our LoRA adapter attached**. So the adapter is the
-> *only* difference between the two, which makes it a controlled experiment.
+> *only* difference between the two, which makes it a controlled experiment: any change in the results comes
+> from fine-tuning.
 >
 > **Step 3:** we generate with **greedy decoding**: the model always picks the most likely next token, so
-> the output is deterministic and repeatable. We keep the first complete SQL query.
+> the output is deterministic and repeatable. We keep the first complete
+> SQL query.
 >
 > **Step 4:** we **run the query on SQLite** and compare the result rows with the correct answer.
+>
+> **Following one question through:** for 'How many singers do we have?', the prompt holds the concert
+> database's four tables plus the question. Both models write `SELECT count(*) FROM singer`. SQLite returns 6,
+> the correct query also returns 6, so both models get this one right. For harder questions with joins, the
+> two branches start to differ, and that's what the results measure.
 >
 > Everything is Python with Hugging Face. Training, evaluation and the demo **share one code path**, so the
 > demo behaves exactly like the model we evaluated. We checked all of it with 56 unit tests on CPU before
@@ -215,30 +249,32 @@ preparation steps.
 
 ---
 
-## Slide 6: Fine-tuning ("LoRA: train 1.2 % of the weights", ~75 s)
+## Slide 6: Fine-tuning ("LoRA: train 1.2 % of the weights", ~100 s)
 
 **On the slide:** the LoRA diagram (input → frozen original model + small trained adapter → added → SQL),
 "What we trained", and the loss curve.
 
 **What to say:**
-> "Read the diagram left to right. The input goes through the **original model**, 1.56 billion weights, which
-> are **frozen**: we never change them. In parallel it goes through a small **LoRA adapter**: 18.5 million
-> weights, the only part we train. The two outputs are added together.
+> "Now the fine-tuning itself. Read the diagram left to right. The input goes through the **original model**,
+> 1.56 billion weights, which are **frozen**: we never change them. In parallel it goes through a small
+> **LoRA adapter**: 18.5 million weights, the only part we train. The two outputs are added together.
 >
-> Mathematically, LoRA learns a low-rank update for a weight matrix, W + B·A, where A and B are thin matrices
-> of rank 16. That is why it's cheap:
+> Mathematically, for a weight matrix W, LoRA learns a low-rank update B·A, where A and B are thin matrices of
+> rank 16, and uses W + B·A. We put these adapters on the attention and feed-forward layers.
+>
+> That is why LoRA is cheap:
 > - only **1.2 % of the weights** are trained;
 > - it fits on a free T4 GPU, using 5.4 GB of memory;
 > - the adapter file is only **74 MB** instead of 3 GB.
 >
-> **What we trained:** 6,560 Spider examples for **two epochs**, 820 optimizer steps. The loss is computed
-> **only on the SQL answer**, not on the prompt, so the model learns to write SQL instead of learning to copy
-> schemas. It took **2 hours 10 minutes** on the free Kaggle GPU.
+> **What we trained:** 6,560 Spider examples for **two epochs**, meaning the model saw every example twice.
+> With 16 examples per step, that is 820 optimizer steps. The loss is computed **only on the SQL answer**, not
+> on the prompt, so the model learns to write SQL instead of learning to copy schemas. It took **2 hours
+> 10 minutes** on the free Kaggle GPU.
 >
-> **The loss curve:** training loss falls from 0.26 to 0.04. Validation loss is lowest at step 200, 0.184,
-> then rises to 0.22. So there is **some over-fitting in the second epoch**; we come back to it under
-> limitations. We fixed all settings in our plan *before* testing, so we evaluated the final adapter as
-> planned rather than choosing a checkpoint after seeing test results."
+> **The loss curve on the right:** the blue line, training loss, falls from 0.26 to 0.04. The orange points are validation loss on the 8 unseen databases. It is lowest at step
+> 200, 0.184, then rises to 0.22. So there is **some over-fitting in the second epoch**. We fixed all settings in our plan *before* testing, so we evaluated the
+> final adapter as planned rather than choosing a checkpoint after seeing test results."
 
 **Settings (if asked):**
 - LoRA rank 16, alpha 32, dropout 0.05.
@@ -264,26 +300,34 @@ preparation steps.
 
 ---
 
-## Slide 7: Evaluation ("Three metrics, one fair comparison", ~55 s)
+## Slide 7: Evaluation ("Three metrics, one fair comparison", ~85 s)
 
 **On the slide:** three metric cards and the "fair comparison" chips.
 
 **What to say:**
-> "We use three metrics.
+> "How do we measure success? We use three metrics.
 >
 > **Execution accuracy** is our primary metric. We run the predicted SQL and the correct SQL and check that
-> they return the same rows. Row order only matters if the correct query has ORDER BY. We use it because two
-> differently written queries can both be correct.
+> they return the same rows. Row order only matters if the correct query has ORDER BY.
 >
 > **Exact match** is the official Spider metric. It parses both queries and compares their parts: SELECT,
-> WHERE, GROUP BY and so on. It's stricter, and it also rewards matching the annotators' writing style.
+> WHERE, GROUP BY and so on.
+>
+> **Here is why we prefer execution accuracy.** 'How many singers do we have?' can be answered with
+> `SELECT count(*) FROM singer` or with `SELECT count(singer_id) FROM singer`. Both are correct and return 6.
+> Execution accuracy accepts both; exact match can reject the second one only because it is written
+> differently. So exact match also rewards copying the annotators' writing style.
 >
 > **Valid-SQL rate** is simply how often the generated query runs without an error.
 >
 > To make the comparison fair, the base and fine-tuned models get the **same prompt, the same greedy decoding
-> and the same 1,034 unseen questions**. Only the adapter differs. Because both models answer the *same*
-> questions, the right statistics are **paired**: McNemar's test on the questions where they disagree, and a
-> bootstrap confidence interval for the gain. We also break every result down by difficulty level."
+> and the same 1,034 unseen questions**. Only the adapter differs.
+>
+> Because both models answer the *same* questions, the right statistics are **paired**:
+> - **McNemar's test** looks only at the questions where the two models disagree;
+> - a **bootstrap confidence interval** tells us how big the gain is, with uncertainty.
+>
+> We also break every result down by the four difficulty levels."
 
 **Likely questions:**
 - *"Why is execution accuracy better than exact match?"* → "`SELECT count(*) FROM singer` and
@@ -305,16 +349,20 @@ preparation steps.
 **On the slide:** the bar chart by difficulty, the metric table, 220 fixed vs 53 broken, McNemar p and the CI.
 
 **What to say:**
-> "On the 1,034 unseen questions, **execution accuracy rises from 57.0 to 73.1 percent**, a gain of 16 points.
+> "Here are the results on the 1,034 unseen questions. **Execution accuracy rises from 57.0 to 73.1
+> percent**, a gain of 16 points. That is about 167 more questions answered correctly.
 >
 > The chart shows the gain at **every difficulty level**:
 >
-> | Level | Base → fine-tuned |
-> |---|---|
-> | easy | 72 → 88 |
-> | medium | 59 → 75 |
-> | **hard** | **40 → 64**, the biggest gain, +24 |
-> | extra hard | 46 → 56 |
+> | Level | Base → fine-tuned | Gain |
+> |---|---|---|
+> | easy | 72 → 88 | +16 |
+> | medium | 59 → 75 | +15 |
+> | **hard** | **40 → 64** | **+24**, the biggest gain |
+> | extra hard | 46 → 56 | +10, the smallest gain |
+>
+> Hard questions need several joins, and that is exactly where the base model was making mistakes. Extra-hard
+> questions need nested queries and set operations, which remain difficult.
 >
 > **Valid SQL rises from 77 to 92 percent**, so far fewer queries crash. **Exact match more than doubles**,
 > from 32 to 68, partly because the model learned Spider's writing style. That's why we trust execution
@@ -323,7 +371,9 @@ preparation steps.
 > **Is it real or luck?** Question by question, fine-tuning **fixed 220 and broke 53**. If fine-tuning did
 > nothing, both directions would be equally likely. McNemar's test gives **p = 2.4 × 10⁻²⁵**, practically
 > zero, and the 95 % confidence interval for the gain is **+13 to +19 points**, far above zero. It's also
-> broad: **18 of the 20 test databases improve**."
+> broad: **18 of the 20 test databases improve**.
+>
+> Let us show you this live."
 
 **▶ LIVE DEMO (right after this slide, ~1–2 min). The TA may ask to run one query.**
 1. Open the Kaggle `PUBLIC LINK`. Point at the status bar: **Model ready**, **GPU: Tesla T4**, **Fine-tuned
@@ -356,23 +406,28 @@ preparation steps.
 
 ---
 
-## Slide 9: Error analysis and generalization ("Fewer broken queries, and it generalizes", ~75 s)
+## Slide 9: Error analysis and generalization ("Fewer broken queries, and it generalizes", ~100 s)
 
 **On the slide:** left: invalid queries 242 → 85, wrong-alias errors 201 → 61, and "still hard: schema
 linking". Right: our own university database, 36.7 % → 73.3 %.
 
 **What to say:**
-> "**Left: what fine-tuning fixed.** The biggest effect is that the model **stops writing SQL that doesn't
+> "Numbers tell you *how much*; error analysis tells you *why*.
+>
+> **Left: what fine-tuning fixed.** The biggest effect is that the model **stops writing SQL that doesn't
 > run**. Queries that fail to execute fall from **242 to 85**.
 >
 > The most common bug was a **wrong table alias**. The base model joins two tables, calls them T1 and T2, and
-> then takes a column from the wrong one, for example `T2.department_name` when that column is in T1. These
-> errors fell from **201 to 61**.
+> then takes a column from the wrong one. For example, it writes `T2.department_name` when department_name is
+> in T1. That is exactly what you just saw in the demo with `T2.title`.
+> These errors fell from **201 to 61**.
 >
 > **What's still hard is schema linking**: choosing the right table, join or column. We read 50 remaining
-> failures by hand, and **27** were schema-linking errors. A few others come from values the model never sees,
-> like writing 'French' when the database stores 'France', because the prompt contains only the schema, not
-> the data.
+> failures by hand, and **27** were schema-linking errors. For example, for 'How many car models are produced
+> in the USA?', the model filters on `country = 'USA'`, but in that database the country column holds an ID
+> number, so it needed one more join to the countries table. A few other errors come from values the model
+> never sees, like writing 'French' when the database stores 'France', because the prompt contains only the
+> schema, not the data.
 >
 > **Right: does it generalize beyond Spider?** We wrote **30 new questions** for our own university database,
 > with the correct SQL fixed *before* running either model. The fine-tuned model keeps its Spider level,
@@ -394,7 +449,7 @@ linking". Right: our own university database, 36.7 % → 73.3 %.
 
 ---
 
-## Slide 10: Conclusion ("Small model, cheap fine-tuning, big gain", ~60 s)
+## Slide 10: Conclusion ("Small model, cheap fine-tuning, big gain", ~80 s)
 
 **On the slide:** four numbers (+16.2, 92 %, 18/20, 1.2 %) and three cards (What we learned, Limitations,
 Future work).
@@ -418,6 +473,9 @@ Future work).
 >
 > **Future work:** show sample cell values in the prompt, stop training early based on validation accuracy,
 > and test on harder benchmarks like BIRD and Spider 2.0.
+>
+> So the main message of our project: you don't need a huge model or an expensive API to query a database in
+> plain English. A small model with cheap, well-evaluated fine-tuning goes a long way.
 >
 > Thank you. We're happy to take questions."
 
