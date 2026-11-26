@@ -1,5 +1,16 @@
 # Progress log (newest first)
 
+## 2026-11-26 — Presentation script for the 10-slide deck
+
+**Done**
+- The deck was edited down to 10 slides by the user: cover, overview, tools, data, method, lora, evaluation, results, errors, conclusion; the demo slide was removed.
+- `PRESENTATION_NOTES.md` rewritten to match: per slide a spoken script, timing and likely TA questions with answers. Also a live-demo script (after slide 8), the general TA questions (why this approach, baselines/RAG, which pipeline parts helped, contamination, speed, read-only) and a number cheat-sheet. It includes a real Spider record for "show me the dataset".
+- Docs-only change.
+
+**Next steps**
+- Read the script together; decide who presents which slides.
+- Optional before presenting: run the few-shot / RAG baseline (about 15 min of GPU) so the "why not RAG?" question has a measured answer.
+
 ## 2026-11-26 — Correction: SQL extraction had no effect on the scores
 
 **Done**
