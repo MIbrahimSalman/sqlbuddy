@@ -1,5 +1,16 @@
 # Progress log (newest first)
 
+## 2026-11-26 — Demo example questions replaced with verified ones
+
+**Done**
+- User reported wrong answers on `university.db`. This is expected (fine-tuned model: 73.3 % on our 30-question test); the failures are schema linking (invented `departments` table, `enrollment_year` on the wrong table, `grades` joined straight to `students`, unseen values like `'Fall 2025'`).
+- Two of the six example buttons were among the failures: "got an A in Databases" (FT writes a broken nested query, and no student has an A there) and "students enrolled in each department's courses" (both fail). They were replaced by two questions from our out-of-domain set that the fine-tuned model answers correctly and the base model fails: "Which course has the most enrollments? Give its title." and "Which students scored below 50 in at least one course?".
+- Verified all six examples with both models through the app's own code path (CPU, greedy): **fine-tuned 6/6 correct; base 2/6**, failing Lahore, average score, most enrollments and below 50 with wrong-alias errors.
+- README and PRESENTATION_NOTES updated (which questions to use; one known failure to show on slide 9). Model and prompt unchanged, so all results stay valid.
+
+**Next steps**
+- Merge, then `bash scripts/deploy.sh` so the Kaggle demo shows the new examples.
+
 ## 2026-11-26 — Presentation script lengthened to 14–15 minutes
 
 **Done**
