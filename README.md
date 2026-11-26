@@ -295,11 +295,15 @@ python app/app.py
 2. Click an example question, choose **Compare both** and press **Generate SQL and run**.
    - Wait until the status bar says **Model ready**. On the very first start the model is downloaded first
      (about 3 GB, once); later starts take seconds.
-   - Good comparison questions: *"What is the average score in each course? Show the course title."* and
-     *"List the names of students from Lahore."* The base model fails both with an alias error; the
-     fine-tuned model answers correctly.
-   - *"How many students are enrolled in each department's courses?"* fails with both models. It is an
-     honest example of the remaining schema-linking errors.
+   - **All six example buttons are verified**: the fine-tuned model answers every one correctly. The base model
+     fails four of them with a wrong-alias error, so they are good for **Compare both**:
+     - *"List the names of students from Lahore."*
+     - *"What is the average score in each course? Show the course title."*
+     - *"Which course has the most enrollments? Give its title."*
+     - *"Which students scored below 50 in at least one course?"*
+   - Expect about 1 wrong answer in 4 on your own questions (73 % on our 30-question test). An honest
+     schema-linking failure to show on purpose: *"For each department, how many enrollments are there in its
+     courses?"* The model invents a `departments` table.
 
 Other options:
 - Local adapter folder instead of HF: `SQLBUDDY_ADAPTER=path/to/adapter python app/app.py`

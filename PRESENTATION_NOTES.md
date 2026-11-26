@@ -393,6 +393,15 @@ preparation steps.
    > (`tests/test_app_safety.py`)."
 7. Backup if the internet fails: run the app on the laptop, or show `results/demo_screenshot.png`.
 
+**Which questions to use:**
+- **All six example buttons are verified:** the fine-tuned model gets every one right, and the base model fails
+  "Lahore", "average score", "most enrollments" and "below 50".
+- For a second Compare, use *"Which course has the most enrollments? Give its title."*
+- If the TA asks their own question and it fails, explain it as schema linking. About 1 in 4 answers on our
+  own database is wrong (73 %).
+- A known failure to show on purpose on slide 9: *"For each department, how many enrollments are there in its
+  courses?"* The model invents a `departments` table, but department is a column in `courses`.
+
 **Likely questions:**
 - *"Why is the gain biggest on hard questions?"* → "Hard questions need several JOINs; that's exactly where
   the base model made alias errors, and fine-tuning fixed most of them."

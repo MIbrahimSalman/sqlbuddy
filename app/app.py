@@ -31,13 +31,16 @@ from sqlbuddy_core import (  # noqa: E402
 MODELS = Models()
 SAMPLE_LABEL, UPLOAD_LABEL = "Sample: university.db", "Upload my own"
 MODES = ["Fine-tuned", "Base", "Compare both"]
+# Example buttons for the sample university.db. Each one is checked (results/ood/predictions.csv): the
+# fine-tuned model answers all of them correctly; the base model fails the 2nd, 3rd, 5th and 6th, which
+# makes them good for "Compare both".
 EXAMPLES = [
     "How many students are there?",
     "List the names of students from Lahore.",
     "What is the average score in each course? Show the course title.",
     "Which teacher teaches the most courses?",
-    "Show the names of students who got an A in Databases.",
-    "How many students are enrolled in each department's courses?",
+    "Which course has the most enrollments? Give its title.",
+    "Which students scored below 50 in at least one course?",
 ]
 NO_RESULT = pd.DataFrame({"(no result)": []})  # empty table with a readable header
 NO_SQL = "-- the generated SQL will appear here"
