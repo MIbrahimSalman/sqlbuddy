@@ -1,5 +1,15 @@
 # Progress log (newest first)
 
+## 2026-11-26 — Correction: SQL extraction had no effect on the scores
+
+**Done**
+- Checked the earlier claim that the base model "added text or code fences 13 % of the time". It is wrong: all 134 cases where the raw output differs from the extracted SQL are only line breaks or a trailing `;`. Re-scoring the raw outputs directly gives the identical execution accuracy (base 56.96 %, fine-tuned 73.11 %). The extraction step is a safety net that this test set never needed.
+- README §5 and results/error_analysis.md were corrected. Docs-only change.
+- Measured Spider statistics for presentation prep: 166 DBs in tables.json; 5.3 tables / 27.1 columns / 4.8 foreign keys per DB on average (max 26 tables, 352 columns); train_spider = 7,000 questions on 140 DBs; dev = 1,034 on 20 DBs (4.0 tables / 22.1 columns on average); 0 DBs shared between train and dev; average question length 12.7 words.
+
+**Next steps**
+- Unchanged: share and export the deck, submit the zip + PDF, start notebook 04 before presenting.
+
 ## 2026-11-22 — Slide deck finalised
 
 **Done**

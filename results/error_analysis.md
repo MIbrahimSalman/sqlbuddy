@@ -72,7 +72,7 @@ These categories come from `src/analysis.py` (sqlglot structural comparison agai
 | `INNER JOIN` used | 40.1 % of queries | 0 % | (Spider writes `JOIN`) |
 | JOINs per query | 0.65 | 0.54 | 0.50 |
 | mean SQL length (chars) | 119 | 106 | 107 |
-| raw output ≠ bare SQL (extra text, fences) | 13.0 % | 0 % | – |
+| raw output ≠ extracted SQL (only line breaks / trailing `;`, never extra text or fences) | 13.0 % | 0 % | – |
 
 - The base model over-joins: it adds tables "to be safe", and that is where its alias errors come from.
 - The fine-tuned model writes queries as compact as the annotators' gold SQL.
