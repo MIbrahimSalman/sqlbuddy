@@ -8,8 +8,10 @@
 - Verified all six examples with both models through the app's own code path (CPU, greedy): **fine-tuned 6/6 correct; base 2/6**, failing Lahore, average score, most enrollments and below 50 with wrong-alias errors.
 - README and PRESENTATION_NOTES updated (which questions to use; one known failure to show on slide 9). Model and prompt unchanged, so all results stay valid.
 
+- Merged ([#15](https://github.com/MIbrahimSalman/sqlbuddy/pull/15)); `deploy.sh` **RESULT OK** (Kaggle run 15: main b942804 on a T4, adapter loaded). Submission zip rebuilt.
+
 **Next steps**
-- Merge, then `bash scripts/deploy.sh` so the Kaggle demo shows the new examples.
+- Use the rebuilt submission zip. Rehearse the demo with the verified examples.
 
 ## 2026-11-26 — Presentation script lengthened to 14–15 minutes
 
